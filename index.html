@@ -40,11 +40,11 @@
         <!-- Equipment Selection UI -->
         <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-indigo-400">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <div class="flex items-center cursor-pointer" onclick="toggleSection('equipSection', 'equipArrow')">
+                <div class="flex items-center cursor-pointer" onclick="toggleSection('equipSection', 'equipArrow', 'equipBtnGroup')">
                     <h2 class="text-xl font-bold text-indigo-600">장비 설정</h2>
                     <span id="equipArrow" class="ml-2 text-indigo-600">▼</span>
                 </div>
-                <div class="flex items-center">
+                <div id="equipBtnGroup" class="flex items-center">
                     <button onclick="unequipAll()" class="text-sm bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition duration-200 ml-4">장비 모두 해제</button>
                 </div>
             </div>
@@ -82,11 +82,11 @@
         <!-- Artifact Selection UI -->
         <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-green-400">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <div class="flex items-center cursor-pointer" onclick="toggleSection('artifactSection', 'artifactArrow')">
+                <div class="flex items-center cursor-pointer" onclick="toggleSection('artifactSection', 'artifactArrow', 'artifactBtnGroup')">
                     <h2 class="text-xl font-bold text-green-600">아티팩트 설정</h2>
                     <span id="artifactArrow" class="ml-2 text-green-600">▼</span>
                 </div>
-                <div class="flex items-center">
+                <div id="artifactBtnGroup" class="flex items-center">
                     <button onclick="setArtifactsUniqueMax()" class="text-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg transition duration-200 ml-4">유니크 이하 최대레벨 설정</button>
                 </div>
             </div>
@@ -140,8 +140,8 @@
                     <input type="number" id="critDmg" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
-                    <label>공격속도 (0~12단계)</label>
-                    <input type="number" id="atkSpeed" class="calc-input" value="0" min="0" max="12">
+                    <label>공격속도 (1~12단계)</label>
+                    <input type="number" id="atkSpeed" class="calc-input" value="1" min="1" max="12">
                 </div>
 
                 <h2 class="text-xl font-bold mt-6 mb-4 text-purple-600 border-b pb-2">몬스터 및 기타 데미지</h2>
@@ -268,7 +268,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>일반공격 또는 스킬 계수 (%)</label>
+                        <label>기본공격 또는 스킬 계수 (%)</label>
                         <input type="number" id="skillMultiplier" class="calc-input" value="100" step="1">
                     </div>
 
@@ -302,11 +302,11 @@
                         </div>
                         <div id="resBasicDmgGroup" class="space-y-4">
                             <div class="flex justify-between items-center border-b border-gray-600 pb-2">
-                                <span class="text-gray-300">노크리 일반공격</span>
+                                <span class="text-gray-300">노크리 기본공격</span>
                                 <span id="resBasicNoCritDmg" class="font-bold text-xl text-orange-300">0</span>
                             </div>
                             <div class="flex justify-between items-center border-b border-gray-600 pb-2">
-                                <span class="text-gray-300">크리 일반공격</span>
+                                <span class="text-gray-300">크리 기본공격</span>
                                 <span id="resBasicCritDmg" class="font-bold text-xl text-red-300">0</span>
                             </div>
                         </div>
@@ -374,20 +374,23 @@
     </div>
 
     <script>
-        function toggleSection(sectionId, arrowId) {
+        function toggleSection(sectionId, arrowId, btnGroupId) {
             const section = document.getElementById(sectionId);
             const arrow = document.getElementById(arrowId);
+            const btnGroup = document.getElementById(btnGroupId);
             if (section.style.display === 'none') {
                 section.style.display = '';
                 arrow.innerText = '▼';
+                if (btnGroup) btnGroup.style.display = '';
             } else {
                 section.style.display = 'none';
                 arrow.innerText = '▶';
+                if (btnGroup) btnGroup.style.display = 'none';
             }
         }
 
         function setArtifactsUniqueMax() {
-            const maxValues = [10, 6, 20, 30, 30, 30, 30, 30, 30, 10];
+            const maxValues = [10, 6, 20, 30, 30, 30, 30, 30, 30];
             for (let i = 0; i < maxValues.length; i++) {
                 const el = document.getElementById('artifact_' + i);
                 if (el) el.value = maxValues[i];
@@ -669,10 +672,14 @@
             let noBuffCritRate = displayTotalCritRate - buffCritRate;
 
             // 공격속도
+            let atkSpeedInput = document.getElementById('atkSpeed');
+            if (parseFloat(atkSpeedInput.value) < 1) {
+                atkSpeedInput.value = 1;
+            }
             let atkSpeed = val('atkSpeed');
             atkSpeed += (val('artifact_1') * Math.min(val('artifact_1_time'), val('dpsTime'))) / val('dpsTime');
             if(atkSpeed > 12) atkSpeed = 12;
-            if(atkSpeed < 0) atkSpeed = 0;
+            if(atkSpeed < 1) atkSpeed = 1;
             const atkSpeedBonus = atkSpeed * 20;
 
             // DPS
