@@ -53,28 +53,70 @@
                 <!-- 1분류: 장비 -->
                 <div>
                     <h3 class="font-bold text-gray-600 mb-2">1분류 (장비)</h3>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>무기</label><select id="equipWeaponType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipWeaponGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipWeaponAtk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>방어구</label><select id="equipArmorType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipArmorGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipArmorAtk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>귀걸이</label><select id="equipEarringType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipEarringGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipEarringAtk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>펜던트</label><select id="equipPendantType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipPendantGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipPendantAtk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>반지 1</label><select id="equipRing1Type" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing1Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing1Atk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>반지 2</label><select id="equipRing2Type" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing2Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing2Atk" class="calc-input" value="0"></div></div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>무기</label><select id="equipWeaponType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipWeaponGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipWeaponInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipWeaponTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>방어구</label><select id="equipArmorType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipArmorGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipArmorAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipArmorInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipArmorTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>귀걸이</label><select id="equipEarringType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipEarringGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipEarringAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipEarringInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipEarringTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펜던트</label><select id="equipPendantType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipPendantGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipPendantAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPendantInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPendantTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 1</label><select id="equipRing1Type" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing1Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing1Inc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipRing1Total" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 2</label><select id="equipRing2Type" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing2Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing2Inc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipRing2Total" class="font-bold text-indigo-600">0</span></div>
+                    </div>
                 </div>
                 <!-- 2분류: 펫 -->
                 <div>
                     <h3 class="font-bold text-gray-600 mb-2">2분류 (펫)</h3>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>펫 1 공격력</label><input type="number" id="equipPet1Atk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>펫 2 공격력</label><input type="number" id="equipPet2Atk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>펫 3 공격력</label><input type="number" id="equipPet3Atk" class="calc-input" value="0"></div></div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 1 공격력</label><input type="number" id="equipPet1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet1Inc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet1Total" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 2 공격력</label><input type="number" id="equipPet2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet2Inc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet2Total" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 3 공격력</label><input type="number" id="equipPet3Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet3Inc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet3Total" class="font-bold text-indigo-600">0</span></div>
+                    </div>
                 </div>
                 <!-- 3분류: 치장 -->
                 <div>
                     <h3 class="font-bold text-gray-600 mb-2">3분류 (치장)</h3>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>치장 무기 공격력</label><input type="number" id="cosWeaponAtk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>치장 반지 공격력</label><input type="number" id="cosRingAtk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>치장 모자 공격력</label><input type="number" id="cosHatAtk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>치장 눈장식 공격력</label><input type="number" id="cosEyeAtk" class="calc-input" value="0"></div></div>
-                    <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>치장 포켓 공격력</label><input type="number" id="cosPocketAtk" class="calc-input" value="0"></div></div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>치장 무기 공격력</label><input type="number" id="cosWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="cosWeaponInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="cosWeaponTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>치장 반지 공격력</label><input type="number" id="cosRingAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="cosRingInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="cosRingTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>치장 모자 공격력</label><input type="number" id="cosHatAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="cosHatInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="cosHatTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>치장 눈장식 공격력</label><input type="number" id="cosEyeAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="cosEyeInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="cosEyeTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
+                    <div class="flex flex-col mb-4 border-b pb-2">
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>치장 포켓 공격력</label><input type="number" id="cosPocketAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="cosPocketInc" class="calc-input" value="0"></div></div>
+                        <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="cosPocketTotal" class="font-bold text-indigo-600">0</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -466,6 +508,7 @@
             document.querySelectorAll('.equip-type-select').forEach(el => el.value = '없음');
             document.querySelectorAll('.equip-grade-select').forEach(el => el.value = '0');
             document.querySelectorAll('input[id$="Atk"]').forEach(el => el.value = '0');
+            document.querySelectorAll('input[id$="Inc"]').forEach(el => el.value = '0');
             calculate();
         }
 
@@ -550,7 +593,34 @@
             ];
 
             atkInputs.forEach(id => {
-                extraAtk += val(id);
+                let baseAtk = val(id);
+                let incId = id.replace('Atk', 'Inc');
+                let incPct = val(incId);
+                let totalAtk = Math.round(baseAtk * (1 + incPct / 100));
+
+                // Update the total display
+                let totalId = id.replace('Atk', 'Total');
+                let totalDisplay = document.getElementById(totalId);
+                if (totalDisplay) {
+                    let formattedAtk = "0";
+                    if (totalAtk !== 0) {
+                        let sign = totalAtk < 0 ? "-" : "";
+                        let absAtk = Math.abs(totalAtk);
+                        let eok = Math.floor(absAtk / 100000000);
+                        let man = Math.floor((absAtk % 100000000) / 10000);
+                        let rest = Math.floor(absAtk % 10000);
+
+                        let res = "";
+                        if (eok > 0) res += eok + "억 ";
+                        if (man > 0) res += man + "만 ";
+                        if (rest > 0) res += rest;
+
+                        formattedAtk = sign + (res.trim() || "0");
+                    }
+                    totalDisplay.innerText = formattedAtk;
+                }
+
+                extraAtk += totalAtk;
             });
 
             originalAttack += extraAtk;
