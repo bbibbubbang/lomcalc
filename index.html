@@ -49,9 +49,9 @@
                 </div>
             </div>
 
-            <div id="equipSection" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div id="equipSection" class="grid grid-cols-1 md:grid-cols-12 gap-6">
                 <!-- 1분류: 장비 -->
-                <div>
+                <div class="md:col-span-6">
                     <h3 class="font-bold text-gray-600 mb-2">1분류 (장비)</h3>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>무기</label><select id="equipWeaponType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipWeaponGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipWeaponInc" class="calc-input" value="0"></div></div>
@@ -79,7 +79,7 @@
                     </div>
                 </div>
                 <!-- 2분류: 펫 -->
-                <div>
+                <div class="md:col-span-3">
                     <h3 class="font-bold text-gray-600 mb-2">2분류 (펫)</h3>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 1 공격력</label><input type="number" id="equipPet1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet1Inc" class="calc-input" value="0"></div></div>
@@ -95,7 +95,7 @@
                     </div>
                 </div>
                 <!-- 3분류: 치장 -->
-                <div>
+                <div class="md:col-span-3">
                     <h3 class="font-bold text-gray-600 mb-2">3분류 (치장)</h3>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>치장 무기 공격력</label><input type="number" id="cosWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="cosWeaponInc" class="calc-input" value="0"></div></div>
