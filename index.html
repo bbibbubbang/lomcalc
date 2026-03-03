@@ -36,6 +36,43 @@
 <body class="bg-gray-100 min-h-screen p-4 md:p-8 font-sans">
     <div class="max-w-6xl mx-auto">
         <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">단풍의 전설 데미지 계산기</h1>
+
+        <!-- Equipment Selection UI -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-indigo-400">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="text-xl font-bold text-indigo-600">장비 설정</h2>
+                <div class="flex items-center">
+                    <input type="checkbox" id="equipConditional" class="calc-input mr-2 w-4 h-4 text-indigo-600">
+                    <label for="equipConditional" class="font-bold text-gray-700 m-0 cursor-pointer">장비 조건부 옵션 적용</label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 1분류: 장비 -->
+                <div>
+                    <h3 class="font-bold text-gray-600 mb-2">1분류 (장비)</h3>
+                    <div class="form-group"><label>무기</label><select id="equipWeapon" class="calc-input equip-select"></select></div>
+                    <div class="form-group"><label>방어구</label><select id="equipArmor" class="calc-input equip-select"></select></div>
+                    <div class="form-group"><label>귀걸이</label><select id="equipEarring" class="calc-input equip-select"></select></div>
+                    <div class="form-group"><label>펜던트</label><select id="equipPendant" class="calc-input equip-select"></select></div>
+                    <div class="form-group"><label>반지 1</label><select id="equipRing1" class="calc-input equip-select"></select></div>
+                </div>
+                <!-- 2분류: 펫 -->
+                <div>
+                    <h3 class="font-bold text-gray-600 mb-2">2분류 (펫)</h3>
+                    <div class="form-group"><label>펫</label><select id="equipPet" class="calc-input equip-select"></select></div>
+                </div>
+                <!-- 3분류: 치장 -->
+                <div>
+                    <h3 class="font-bold text-gray-600 mb-2">3분류 (치장)</h3>
+                    <div class="form-group"><label>치장 무기</label><select id="cosWeapon" class="calc-input equip-select"></select></div>
+                    <div class="form-group"><label>치장 반지</label><select id="cosRing" class="calc-input equip-select"></select></div>
+                    <div class="form-group"><label>치장 모자</label><select id="cosHat" class="calc-input equip-select"></select></div>
+                    <div class="form-group"><label>치장 눈장식</label><select id="cosEye" class="calc-input equip-select"></select></div>
+                    <div class="form-group"><label>치장 포켓</label><select id="cosPocket" class="calc-input equip-select"></select></div>
+                </div>
+            </div>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Left Column: Stats 1 -->
@@ -193,6 +230,16 @@
                         <label>적이 받는 피해량 증가 (%)</label>
                         <input type="number" id="dmgTakenInc" class="calc-input" value="0" step="0.1">
                     </div>
+
+                    <h2 class="text-xl font-bold mt-6 mb-4 text-orange-600 border-b pb-2">DPS 측정 설정</h2>
+                    <div class="form-group">
+                        <label>1초당 타격 횟수(타수)</label>
+                        <input type="number" id="hitsPerSec" class="calc-input" value="1" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>딜 측정 시간(초)</label>
+                        <input type="number" id="dpsTime" class="calc-input" value="10" step="1" min="1">
+                    </div>
                 </div>
 
                 <!-- Results -->
@@ -213,24 +260,138 @@
                             <span id="resAtkSpeed" class="font-bold text-lg text-green-300">+0%</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-gray-600 pb-2 mt-4">
-                            <span class="text-gray-300 text-lg">노크리 데미지</span>
-                            <span id="resNoCritDmg" class="font-bold text-2xl text-orange-400">0</span>
+                            <span class="text-gray-300">노크리 일반공격</span>
+                            <span id="resBasicNoCritDmg" class="font-bold text-xl text-orange-300">0</span>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-gray-300 text-lg">크리티컬 데미지</span>
-                            <span id="resCritDmg" class="font-bold text-3xl text-red-400">0</span>
+                        <div class="flex justify-between items-center border-b border-gray-600 pb-2">
+                            <span class="text-gray-300">크리 일반공격</span>
+                            <span id="resBasicCritDmg" class="font-bold text-xl text-red-300">0</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-600 pb-2">
+                            <span class="text-gray-300">노크리 스킬공격</span>
+                            <span id="resSkillNoCritDmg" class="font-bold text-xl text-orange-400">0</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-600 pb-2">
+                            <span class="text-gray-300">크리 스킬공격</span>
+                            <span id="resSkillCritDmg" class="font-bold text-xl text-red-400">0</span>
                         </div>
                         <div class="flex justify-between items-center mt-2 bg-gray-700 p-2 rounded">
                             <span class="text-gray-200">평균 데미지 (기대값)</span>
                             <span id="resAvgDmg" class="font-bold text-xl text-yellow-300">0</span>
                         </div>
+                        <div class="flex justify-between items-center mt-4 bg-gray-900 p-3 rounded-lg border border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.3)]">
+                            <span class="text-yellow-400 font-bold text-lg">평균 DPS</span>
+                            <span id="resAvgDPS" class="font-bold text-2xl text-yellow-400">0</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2 bg-gray-900 p-3 rounded-lg border border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+                            <span class="text-red-400 font-bold text-lg">최종 총 데미지</span>
+                            <span id="resTotalDmg" class="font-bold text-2xl text-red-400">0</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Preset Section -->
+        <div class="mt-6 bg-white p-6 rounded-lg shadow-md border-2 border-green-400">
+            <h2 class="text-xl font-bold mb-4 text-green-600 border-b pb-2">프리셋 및 순위표</h2>
+            <div class="flex gap-4 mb-6">
+                <input type="text" id="presetName" class="calc-input flex-grow" placeholder="프리셋 이름 (미입력시 프리셋 1, 2...)">
+                <button onclick="savePreset()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
+                    저장
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">순위</th>
+                            <th scope="col" class="px-6 py-3">프리셋 이름</th>
+                            <th scope="col" class="px-6 py-3">평균 DPS</th>
+                            <th scope="col" class="px-6 py-3">불러오기 / 삭제</th>
+                        </tr>
+                    </thead>
+                    <tbody id="presetTableBody">
+                        <!-- Presets will be loaded here -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
     <script>
+        // Equipment Data
+        const equipmentData = {
+            equipWeapon: [
+                { name: "없음", stats: {} },
+                { name: "초보자의 검", stats: { attackPct: 2 } },
+                { name: "전설의 검", stats: { attackPct: 15, bossMonsterDmg: 20 }, conditional: { critDmg: 10 } }
+            ],
+            equipArmor: [
+                { name: "없음", stats: {} },
+                { name: "가죽 갑옷", stats: { allDmg: 5 } },
+                { name: "드래곤 갑옷", stats: { allDmg: 15, normalMonsterDmg: 10 } }
+            ],
+            equipEarring: [
+                { name: "없음", stats: {} },
+                { name: "은 귀걸이", stats: { critRate: 2 } },
+                { name: "루비 귀걸이", stats: { critRate: 5, critDmg: 10 } }
+            ],
+            equipPendant: [
+                { name: "없음", stats: {} },
+                { name: "목걸이", stats: { attackDamagePct: 5 } },
+                { name: "마력의 목걸이", stats: { attackDamagePct: 15, skillDmg: 10 } }
+            ],
+            equipRing1: [
+                { name: "없음", stats: {} },
+                { name: "구리 반지", stats: { allClassDmg: 2 } },
+                { name: "절대 반지", stats: { allClassDmg: 10, allDmg: 10 } }
+            ],
+            equipPet: [
+                { name: "없음", stats: {} },
+                { name: "달팽이", stats: { attackPct: 1 } },
+                { name: "아기 드래곤", stats: { attackPct: 5, bossMonsterDmg: 15 } }
+            ],
+            cosWeapon: [
+                { name: "없음", stats: {} },
+                { name: "장난감 검", stats: { dmgTakenInc: 2 } }
+            ],
+            cosRing: [
+                { name: "없음", stats: {} },
+                { name: "우정 반지", stats: { aoeDmg: 5 } }
+            ],
+            cosHat: [
+                { name: "없음", stats: {} },
+                { name: "밀짚모자", stats: { projectileDmg: 5 } }
+            ],
+            cosEye: [
+                { name: "없음", stats: {} },
+                { name: "선글라스", stats: { basicAttackDmg: 5 } }
+            ],
+            cosPocket: [
+                { name: "없음", stats: {} },
+                { name: "부적", stats: { advAttackPct: 5 } }
+            ]
+        };
+
+        function initEquipment() {
+            for (const [id, items] of Object.entries(equipmentData)) {
+                const select = document.getElementById(id);
+                if(select) {
+                    items.forEach((item, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = item.name;
+                        select.appendChild(option);
+                    });
+                }
+            }
+        }
+
+        // Initialize equipment dropdowns early
+        initEquipment();
+
         // Cookie Helpers
         function setCookie(name, value, days) {
             let expires = "";
@@ -263,7 +424,11 @@
                     const parsed = JSON.parse(savedData);
                     inputs.forEach(input => {
                         if (parsed[input.id] !== undefined) {
-                            input.value = parsed[input.id];
+                            if (input.type === 'checkbox') {
+                                input.checked = parsed[input.id];
+                            } else {
+                                input.value = parsed[input.id];
+                            }
                         }
                     });
                 } catch (e) {
@@ -276,7 +441,11 @@
         function saveSettings() {
             const data = {};
             inputs.forEach(input => {
-                data[input.id] = input.value;
+                if (input.type === 'checkbox') {
+                    data[input.id] = input.checked;
+                } else {
+                    data[input.id] = input.value;
+                }
             });
             setCookie('mapleCalcData', JSON.stringify(data), 30); // Save for 30 days
         }
@@ -286,13 +455,58 @@
             // Helper to get number value safely
             const val = (id) => parseFloat(document.getElementById(id).value) || 0;
             const str = (id) => document.getElementById(id).value;
+            const isChecked = (id) => document.getElementById(id).checked;
 
             // 1. 역산: 원본 공격력
-            const finalAttack = val('finalAttack');
-            const attackPct = val('attackPct');
-            const advAttackPct = val('advAttackPct');
+            let finalAttack = val('finalAttack');
+            let attackPct = val('attackPct');
+            let advAttackPct = val('advAttackPct');
+
+            let originalAttack = finalAttack / ((1 + attackPct / 100) * (1 + advAttackPct / 100));
+
+            // Aggregate equipment stats
+            let eqStats = {
+                attackPct: 0,
+                advAttackPct: 0,
+                critRate: 0,
+                critDmg: 0,
+                allDmg: 0,
+                normalMonsterDmg: 0,
+                bossMonsterDmg: 0,
+                aoeDmg: 0,
+                projectileDmg: 0,
+                allClassDmg: 0,
+                basicAttackDmg: 0,
+                skillDmg: 0,
+                attackDamagePct: 0,
+                dmgTakenInc: 0
+            };
+
+            const conditionalEnabled = isChecked('equipConditional');
             
-            const originalAttack = finalAttack / ((1 + attackPct / 100) * (1 + advAttackPct / 100));
+            for (const [id, items] of Object.entries(equipmentData)) {
+                const select = document.getElementById(id);
+                if (select && select.value) {
+                    const selectedItem = items[parseInt(select.value)];
+                    if (selectedItem && selectedItem.stats) {
+                        for (const [stat, value] of Object.entries(selectedItem.stats)) {
+                            if (eqStats[stat] !== undefined) eqStats[stat] += value;
+                        }
+                    }
+                    if (conditionalEnabled && selectedItem && selectedItem.conditional) {
+                        for (const [stat, value] of Object.entries(selectedItem.conditional)) {
+                            if (eqStats[stat] !== undefined) eqStats[stat] += value;
+                        }
+                    }
+                }
+            }
+
+            // Apply equipment stats
+            attackPct += eqStats.attackPct;
+            advAttackPct += eqStats.advAttackPct;
+
+            // Recalculate finalAttack with equipment
+            finalAttack = originalAttack * (1 + attackPct / 100) * (1 + advAttackPct / 100);
 
             // Variables based on settings
             const attackType = str('attackType');
@@ -308,57 +522,69 @@
             if(myClass === '도적') myClassDmg = val('thiefDmg');
             if(myClass === '해적') myClassDmg = val('pirateDmg');
 
-            const allClassDmg = val('allClassDmg');
-
-            // 공격 타입 (기본공격/스킬) 데미지
-            const typeDmg = attackType === '기본공격' ? val('basicAttackDmg') : val('skillDmg');
+            const allClassDmg = val('allClassDmg') + eqStats.allClassDmg;
             
             // 몬스터 데미지
-            const monsterDmg = monsterType === '일반' ? val('normalMonsterDmg') : val('bossMonsterDmg');
-            
-            const allDmg = val('allDmg');
+            const monsterDmgBase = monsterType === '일반' ? val('normalMonsterDmg') + eqStats.normalMonsterDmg : val('bossMonsterDmg') + eqStats.bossMonsterDmg;
+            const allDmg = val('allDmg') + eqStats.allDmg;
             const skillMultiplier = val('skillMultiplier');
-            const attackDamagePct = val('attackDamagePct');
-            const dmgTakenInc = val('dmgTakenInc');
+            const attackDamagePct = val('attackDamagePct') + eqStats.attackDamagePct;
+            const dmgTakenInc = val('dmgTakenInc') + eqStats.dmgTakenInc;
 
             // 형태 피해량 (범위/발사체)
             let hitTypeDmgMultiplier = 1;
-            if(hitType === '범위') hitTypeDmgMultiplier = 1 + val('aoeDmg') / 100;
-            if(hitType === '발사체') hitTypeDmgMultiplier = 1 + val('projectileDmg') / 100;
+            if(hitType === '범위') hitTypeDmgMultiplier = 1 + (val('aoeDmg') + eqStats.aoeDmg) / 100;
+            if(hitType === '발사체') hitTypeDmgMultiplier = 1 + (val('projectileDmg') + eqStats.projectileDmg) / 100;
 
-            // 추가 곱연산
             const extraAttackDamageMultiplier = 1 + attackDamagePct / 100;
             const dmgTakenMultiplier = 1 + dmgTakenInc / 100;
 
-            // 노크리 데미지 계산식:
-            // 데미지 = 원본 공격력 * (1+공격력%) * (1+모험공격력%) * 계수 * (1+내직업+전직업) * (1+기본/스킬데미지) * (1+몬스터데미지) * (1+모든데미지) * 형태피해량 * 일반/스킬피해량 * 받는피해증가 * 0.99
-            // 참고: 원본 공격력 * (1+공격력%) * (1+모험공격력%) = 최종 공격력(finalAttack)
-            
-            const noCritDamage = finalAttack 
+            const baseDamageMultiplier = finalAttack
                                * (skillMultiplier / 100) 
                                * (1 + (myClassDmg + allClassDmg) / 100) 
-                               * (1 + typeDmg / 100) 
-                               * (1 + monsterDmg / 100) 
+                               * (1 + monsterDmgBase / 100)
                                * (1 + allDmg / 100) 
                                * hitTypeDmgMultiplier 
                                * extraAttackDamageMultiplier 
                                * dmgTakenMultiplier 
                                * 0.99;
 
+            // 공격 타입 (기본공격/스킬) 데미지
+            const basicTypeDmg = val('basicAttackDmg') + eqStats.basicAttackDmg;
+            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg;
+
+            const basicNoCritDamage = baseDamageMultiplier * (1 + basicTypeDmg / 100);
+            const skillNoCritDamage = baseDamageMultiplier * (1 + skillTypeDmg / 100);
+
             // 크리티컬 확률 & 데미지
-            const typeCritRate = attackType === '기본공격' ? val('basicCritRate') : val('skillCritRate');
-            const typeCritDmg = attackType === '기본공격' ? val('basicCritDmg') : val('skillCritDmg');
+            const baseCritRate = val('critRate') + eqStats.critRate;
+            const baseCritDmg = val('critDmg') + eqStats.critDmg;
 
-            let totalCritRate = val('critRate') + typeCritRate;
-            if(totalCritRate > 100) totalCritRate = 100;
-            if(totalCritRate < 0) totalCritRate = 0;
+            const basicCritRateAdded = val('basicCritRate');
+            const basicCritDmgAdded = val('basicCritDmg');
+            const skillCritRateAdded = val('skillCritRate');
+            const skillCritDmgAdded = val('skillCritDmg');
 
-            const totalCritDmg = val('critDmg') + typeCritDmg;
+            let basicTotalCritRate = baseCritRate + basicCritRateAdded;
+            if(basicTotalCritRate > 100) basicTotalCritRate = 100;
+            if(basicTotalCritRate < 0) basicTotalCritRate = 0;
 
-            const critDamage = noCritDamage * (1 + totalCritDmg / 100);
+            let skillTotalCritRate = baseCritRate + skillCritRateAdded;
+            if(skillTotalCritRate > 100) skillTotalCritRate = 100;
+            if(skillTotalCritRate < 0) skillTotalCritRate = 0;
+
+            const basicTotalCritDmg = baseCritDmg + basicCritDmgAdded;
+            const skillTotalCritDmg = baseCritDmg + skillCritDmgAdded;
+
+            const basicCritDamage = basicNoCritDamage * (1 + basicTotalCritDmg / 100);
+            const skillCritDamage = skillNoCritDamage * (1 + skillTotalCritDmg / 100);
 
             // 평균 데미지
-            const avgDamage = (noCritDamage * (1 - totalCritRate/100)) + (critDamage * (totalCritRate/100));
+            const basicAvgDamage = (basicNoCritDamage * (1 - basicTotalCritRate/100)) + (basicCritDamage * (basicTotalCritRate/100));
+            const skillAvgDamage = (skillNoCritDamage * (1 - skillTotalCritRate/100)) + (skillCritDamage * (skillTotalCritRate/100));
+
+            const avgDamage = attackType === '기본공격' ? basicAvgDamage : skillAvgDamage;
+            let displayCritRate = attackType === '기본공격' ? basicTotalCritRate : skillTotalCritRate;
 
             // 공격속도
             let atkSpeed = val('atkSpeed');
@@ -366,14 +592,26 @@
             if(atkSpeed < 0) atkSpeed = 0;
             const atkSpeedBonus = atkSpeed * 20;
 
+            // DPS
+            const hitsPerSec = val('hitsPerSec');
+            const dpsTime = val('dpsTime');
+            const finalHitsPerSec = hitsPerSec * (1 + atkSpeedBonus / 100);
+            const avgDPS = avgDamage * finalHitsPerSec;
+            const totalDmg = avgDPS * dpsTime;
+
             // Update UI
             document.getElementById('resOriginalAttack').innerText = originalAttack.toLocaleString(undefined, {maximumFractionDigits: 1});
-            document.getElementById('resCritRate').innerText = totalCritRate.toFixed(1) + '%';
+            document.getElementById('resCritRate').innerText = displayCritRate.toFixed(1) + '%';
             document.getElementById('resAtkSpeed').innerText = '+' + atkSpeedBonus + '%';
             
-            document.getElementById('resNoCritDmg').innerText = Math.floor(noCritDamage).toLocaleString();
-            document.getElementById('resCritDmg').innerText = Math.floor(critDamage).toLocaleString();
+            document.getElementById('resBasicNoCritDmg').innerText = Math.floor(basicNoCritDamage).toLocaleString();
+            document.getElementById('resBasicCritDmg').innerText = Math.floor(basicCritDamage).toLocaleString();
+            document.getElementById('resSkillNoCritDmg').innerText = Math.floor(skillNoCritDamage).toLocaleString();
+            document.getElementById('resSkillCritDmg').innerText = Math.floor(skillCritDamage).toLocaleString();
             document.getElementById('resAvgDmg').innerText = Math.floor(avgDamage).toLocaleString();
+
+            document.getElementById('resAvgDPS').innerText = Math.floor(avgDPS).toLocaleString();
+            document.getElementById('resTotalDmg').innerText = Math.floor(totalDmg).toLocaleString();
 
             saveSettings();
         }
@@ -384,9 +622,109 @@
             input.addEventListener('change', calculate);
         });
 
+        // Preset Functions
+        function getPresets() {
+            const saved = localStorage.getItem('mapleCalcPresets');
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        function savePresetsToLocal(presets) {
+            localStorage.setItem('mapleCalcPresets', JSON.stringify(presets));
+        }
+
+        function savePreset() {
+            let nameInput = document.getElementById('presetName').value.trim();
+            const presets = getPresets();
+
+            if (!nameInput) {
+                nameInput = `프리셋 ${presets.length + 1}`;
+            }
+
+            const currentData = {};
+            document.querySelectorAll('.calc-input').forEach(input => {
+                if(input.id && input.id !== 'presetName') {
+                    if (input.type === 'checkbox') {
+                        currentData[input.id] = input.checked;
+                    } else {
+                        currentData[input.id] = input.value;
+                    }
+                }
+            });
+
+            // Get the latest calculated DPS by recalculating
+            // Note: calculation logic updates resAvgDPS, we grab the raw value calculated inside calculate() implicitly.
+            // Better yet, we just trigger calculate to ensure DOM is fresh and parse it.
+            calculate();
+            const avgDPSStr = document.getElementById('resAvgDPS').innerText.replace(/,/g, '');
+            const currentDPS = parseFloat(avgDPSStr) || 0;
+
+            const newPreset = {
+                id: Date.now(),
+                name: nameInput,
+                dps: currentDPS,
+                data: currentData
+            };
+
+            presets.push(newPreset);
+            // Sort by DPS descending
+            presets.sort((a, b) => b.dps - a.dps);
+            savePresetsToLocal(presets);
+
+            document.getElementById('presetName').value = ''; // clear input
+            renderPresets();
+        }
+
+        function loadPreset(id) {
+            const presets = getPresets();
+            const preset = presets.find(p => p.id === id);
+            if (preset && preset.data) {
+                for (const [key, value] of Object.entries(preset.data)) {
+                    const input = document.getElementById(key);
+                    if (input) {
+                        if (input.type === 'checkbox') {
+                            input.checked = value;
+                        } else {
+                            input.value = value;
+                        }
+                    }
+                }
+                calculate();
+            }
+        }
+
+        function deletePreset(id) {
+            let presets = getPresets();
+            presets = presets.filter(p => p.id !== id);
+            savePresetsToLocal(presets);
+            renderPresets();
+        }
+
+        function renderPresets() {
+            const presets = getPresets();
+            const tbody = document.getElementById('presetTableBody');
+            tbody.innerHTML = '';
+
+            presets.forEach((preset, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'bg-white border-b hover:bg-gray-50';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold ${index === 0 ? 'text-yellow-500' : 'text-gray-900'}">${index + 1}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900">${preset.name}</td>
+                    <td class="px-6 py-4 text-blue-600 font-bold">${Math.floor(preset.dps).toLocaleString()}</td>
+                    <td class="px-6 py-4">
+                        <button onclick="loadPreset(${preset.id})" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-2 mb-2">불러오기</button>
+                        <button onclick="deletePreset(${preset.id})" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center mb-2">삭제</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         // Initialize
         loadSettings();
         calculate();
+        renderPresets();
 
     </script>
 </body>
