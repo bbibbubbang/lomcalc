@@ -40,13 +40,16 @@
         <!-- Equipment Selection UI -->
         <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-indigo-400">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h2 class="text-xl font-bold text-indigo-600">장비 설정</h2>
+                <div class="flex items-center cursor-pointer" onclick="toggleSection('equipSection', 'equipArrow')">
+                    <h2 class="text-xl font-bold text-indigo-600">장비 설정</h2>
+                    <span id="equipArrow" class="ml-2 text-indigo-600">▼</span>
+                </div>
                 <div class="flex items-center">
                     <button onclick="unequipAll()" class="text-sm bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition duration-200 ml-4">장비 모두 해제</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div id="equipSection" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- 1분류: 장비 -->
                 <div>
                     <h3 class="font-bold text-gray-600 mb-2">1분류 (장비)</h3>
@@ -72,6 +75,42 @@
                     <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>치장 모자 공격력</label><input type="number" id="cosHatAtk" class="calc-input" value="0"></div></div>
                     <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>치장 눈장식 공격력</label><input type="number" id="cosEyeAtk" class="calc-input" value="0"></div></div>
                     <div class="flex gap-2 mb-2"><div class="form-group flex-grow m-0"><label>치장 포켓 공격력</label><input type="number" id="cosPocketAtk" class="calc-input" value="0"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Artifact Selection UI -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-green-400">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <div class="flex items-center cursor-pointer" onclick="toggleSection('artifactSection', 'artifactArrow')">
+                    <h2 class="text-xl font-bold text-green-600">아티팩트 설정</h2>
+                    <span id="artifactArrow" class="ml-2 text-green-600">▼</span>
+                </div>
+                <div class="flex items-center">
+                    <button onclick="setArtifactsUniqueMax()" class="text-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg transition duration-200 ml-4">유니크 이하 최대레벨 설정</button>
+                </div>
+            </div>
+
+            <div id="artifactSection" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 아티팩트 목록 -->
+                <div class="flex flex-col gap-2">
+                    <div class="form-group flex-grow m-0"><label>수상한 무기상자</label><input type="number" id="artifact_0" class="calc-input" value="0"></div>
+                    <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>메이플 택배</label><input type="number" id="artifact_1" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>적용시간(초)</label><input type="number" id="artifact_1_time" class="calc-input" value="7"></div></div>
+                    <div class="form-group flex-grow m-0"><label>크림슨발록의 비행선</label><input type="number" id="artifact_2" class="calc-input" value="0"></div>
+                    <div class="form-group flex-grow m-0"><label>메이플 월드의 여신</label><input type="number" id="artifact_3" class="calc-input" value="0"></div>
+                    <div class="form-group flex-grow m-0"><label>전사 영웅의 석상</label><input type="number" id="artifact_4" class="calc-input" value="0"></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="form-group flex-grow m-0"><label>마법사 영웅의 석상</label><input type="number" id="artifact_5" class="calc-input" value="0"></div>
+                    <div class="form-group flex-grow m-0"><label>궁수 영웅의 석상</label><input type="number" id="artifact_6" class="calc-input" value="0"></div>
+                    <div class="form-group flex-grow m-0"><label>도적 영웅의 석상</label><input type="number" id="artifact_7" class="calc-input" value="0"></div>
+                    <div class="form-group flex-grow m-0"><label>해적 영웅의 석상</label><input type="number" id="artifact_8" class="calc-input" value="0"></div>
+                    <div class="form-group flex-grow m-0"><label>슈가의 단풍나무</label><input type="number" id="artifact_9" class="calc-input" value="0"></div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="form-group flex-grow m-0"><label>핑크빈 용사 동상</label><input type="number" id="artifact_10" class="calc-input" value="0"></div>
+                    <div class="form-group flex-grow m-0"><label>알트 점프</label><input type="number" id="artifact_11" class="calc-input" value="0"></div>
+                    <div class="form-group flex-grow m-0"><label>차원의 서</label><input type="number" id="artifact_12" class="calc-input" value="0"></div>
                 </div>
             </div>
         </div>
@@ -261,8 +300,8 @@
                             <span class="text-gray-300">버프 크리티컬 확률</span>
                             <span id="resBuffCritRate" class="font-bold text-lg text-blue-300">0%</span>
                         </div>
-                        <div id="resBasicDmgGroup">
-                            <div class="flex justify-between items-center border-b border-gray-600 pb-2 mt-4">
+                        <div id="resBasicDmgGroup" class="space-y-4">
+                            <div class="flex justify-between items-center border-b border-gray-600 pb-2">
                                 <span class="text-gray-300">노크리 일반공격</span>
                                 <span id="resBasicNoCritDmg" class="font-bold text-xl text-orange-300">0</span>
                             </div>
@@ -271,8 +310,8 @@
                                 <span id="resBasicCritDmg" class="font-bold text-xl text-red-300">0</span>
                             </div>
                         </div>
-                        <div id="resSkillDmgGroup" style="display: none;">
-                            <div class="flex justify-between items-center border-b border-gray-600 pb-2 mt-4">
+                        <div id="resSkillDmgGroup" class="space-y-4" style="display: none;">
+                            <div class="flex justify-between items-center border-b border-gray-600 pb-2">
                                 <span class="text-gray-300">노크리 스킬공격</span>
                                 <span id="resSkillNoCritDmg" class="font-bold text-xl text-orange-400">0</span>
                             </div>
@@ -281,16 +320,16 @@
                                 <span id="resSkillCritDmg" class="font-bold text-xl text-red-400">0</span>
                             </div>
                         </div>
-                        <div id="resBuffList" class="mt-4 text-sm text-gray-400"></div>
-                        <div class="flex justify-between items-center mt-2 bg-gray-700 p-2 rounded">
+                        <div id="resBuffList" class="text-sm text-gray-400"></div>
+                        <div class="flex justify-between items-center bg-gray-700 p-2 rounded">
                             <span class="text-gray-200">평균 데미지 (기대값)</span>
                             <span id="resAvgDmg" class="font-bold text-xl text-yellow-300">0</span>
                         </div>
-                        <div class="flex justify-between items-center mt-4 bg-gray-900 p-3 rounded-lg border border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.3)]">
+                        <div class="flex justify-between items-center bg-gray-900 p-3 rounded-lg border border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.3)]">
                             <span class="text-yellow-400 font-bold text-lg">평균 DPS</span>
                             <span id="resAvgDPS" class="font-bold text-2xl text-yellow-400">0</span>
                         </div>
-                        <div class="flex justify-between items-center mt-2 bg-gray-900 p-3 rounded-lg border border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+                        <div class="flex justify-between items-center bg-gray-900 p-3 rounded-lg border border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
                             <span class="text-red-400 font-bold text-lg">최종 총 데미지</span>
                             <span id="resTotalDmg" class="font-bold text-2xl text-red-400">0</span>
                         </div>
@@ -335,6 +374,29 @@
     </div>
 
     <script>
+        function toggleSection(sectionId, arrowId) {
+            const section = document.getElementById(sectionId);
+            const arrow = document.getElementById(arrowId);
+            if (section.style.display === 'none') {
+                section.style.display = '';
+                arrow.innerText = '▼';
+            } else {
+                section.style.display = 'none';
+                arrow.innerText = '▶';
+            }
+        }
+
+        function setArtifactsUniqueMax() {
+            const maxValues = [10, 6, 20, 30, 30, 30, 30, 30, 30, 10];
+            for (let i = 0; i < maxValues.length; i++) {
+                const el = document.getElementById('artifact_' + i);
+                if (el) el.value = maxValues[i];
+            }
+            const timeEl = document.getElementById('artifact_1_time');
+            if (timeEl) timeEl.value = 7;
+            calculate();
+        }
+
         const gradeList = ["없음", "노말1", "레어", "레어1", "에픽", "에픽1", "에픽2", "유니크", "유니크1", "유니크2", "레전더리", "레전더리1", "레전더리2", "레전더리3", "레전더리4", "레전더리5", "레전더리6", "레전더리7", "레전더리8", "레전더리9", "레전더리10"];
         const equipmentData = {
           "무기": { "base_atk": 50, "cumulative_percentages": [50, 100, 150, 200, 250, 300, 400, 450, 500, 800, 950, 1100, 1250, 1400, 1550, 1600, 1650, 1700, 1750, 1800] },
@@ -511,6 +573,14 @@
             let conditionalCritRate = 0;
             let appliedBuffs = [];
 
+            // Apply Artifact stats
+            eqStats.attackPct += val('artifact_0') + val('artifact_9');
+            eqStats.normalMonsterDmg += val('artifact_2');
+            eqStats.basicAttackDmg += val('artifact_3');
+            eqStats.critRate += val('artifact_11');
+            eqStats.critDmg += val('artifact_11');
+            eqStats.allDmg += val('artifact_12');
+
             // Apply equipment stats
             attackPct += eqStats.attackPct;
             advAttackPct += eqStats.advAttackPct;
@@ -526,11 +596,11 @@
 
             // 직업 데미지
             let myClassDmg = 0;
-            if(myClass === '전사') myClassDmg = val('warriorDmg');
-            if(myClass === '마법사') myClassDmg = val('mageDmg');
-            if(myClass === '궁수') myClassDmg = val('archerDmg');
-            if(myClass === '도적') myClassDmg = val('thiefDmg');
-            if(myClass === '해적') myClassDmg = val('pirateDmg');
+            if(myClass === '전사') myClassDmg = val('warriorDmg') + val('artifact_4');
+            if(myClass === '마법사') myClassDmg = val('mageDmg') + val('artifact_5');
+            if(myClass === '궁수') myClassDmg = val('archerDmg') + val('artifact_6');
+            if(myClass === '도적') myClassDmg = val('thiefDmg') + val('artifact_7');
+            if(myClass === '해적') myClassDmg = val('pirateDmg') + val('artifact_8');
 
             const allClassDmg = val('allClassDmg') + eqStats.allClassDmg;
             
@@ -561,7 +631,7 @@
 
             // 공격 타입 (기본공격/스킬) 데미지
             const basicTypeDmg = val('basicAttackDmg') + eqStats.basicAttackDmg;
-            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg;
+            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg + (attackType === '스킬' && (hitType === '범위' || hitType === '발사체') ? val('artifact_10') : 0);
 
             const basicNoCritDamage = baseDamageMultiplier * (1 + basicTypeDmg / 100);
             const skillNoCritDamage = baseDamageMultiplier * (1 + skillTypeDmg / 100);
@@ -600,6 +670,7 @@
 
             // 공격속도
             let atkSpeed = val('atkSpeed');
+            atkSpeed += (val('artifact_1') * Math.min(val('artifact_1_time'), val('dpsTime'))) / val('dpsTime');
             if(atkSpeed > 12) atkSpeed = 12;
             if(atkSpeed < 0) atkSpeed = 0;
             const atkSpeedBonus = atkSpeed * 20;
@@ -607,7 +678,7 @@
             // DPS
             const hitsPerSec = val('hitsPerSec');
             const dpsTime = val('dpsTime');
-            const finalHitsPerSec = hitsPerSec * (1 + atkSpeedBonus / 100);
+            const finalHitsPerSec = attackType === '스킬' ? hitsPerSec : hitsPerSec * (1 + atkSpeedBonus / 100);
             const avgDPS = avgDamage * finalHitsPerSec;
             const totalDmg = avgDPS * dpsTime;
 
