@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단풍의 전설 데미지 계산기</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: white;
+        }
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: #374151;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8 font-sans">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">단풍의 전설 데미지 계산기</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Column: Stats 1 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-bold mb-4 text-blue-600 border-b pb-2">기본 능력치</h2>
+                <div class="form-group">
+                    <label>능력치 최종 공격력</label>
+                    <input type="number" id="finalAttack" class="calc-input" value="1000">
+                </div>
+                <div class="form-group">
+                    <label>공격력 (%)</label>
+                    <input type="number" id="attackPct" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>공격력(모험) (%)</label>
+                    <input type="number" id="advAttackPct" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>크리티컬 확률 (%)</label>
+                    <input type="number" id="critRate" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>크리티컬 데미지 (%)</label>
+                    <input type="number" id="critDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>공격속도 (0~12단계)</label>
+                    <input type="number" id="atkSpeed" class="calc-input" value="0" min="0" max="12">
+                </div>
+
+                <h2 class="text-xl font-bold mt-6 mb-4 text-purple-600 border-b pb-2">몬스터 및 기타 데미지</h2>
+                <div class="form-group">
+                    <label>모든 데미지 (%)</label>
+                    <input type="number" id="allDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>일반 몬스터 데미지 (%)</label>
+                    <input type="number" id="normalMonsterDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>보스 몬스터 데미지 (%)</label>
+                    <input type="number" id="bossMonsterDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>범위 피해량 (%)</label>
+                    <input type="number" id="aoeDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>발사체 피해량 (%)</label>
+                    <input type="number" id="projectileDmg" class="calc-input" value="0" step="0.1">
+                </div>
+            </div>
+
+            <!-- Middle Column: Stats 2 -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-bold mb-4 text-green-600 border-b pb-2">직업별 데미지</h2>
+                <div class="form-group">
+                    <label>내 직업 선택</label>
+                    <select id="myClass" class="calc-input">
+                        <option value="전사">전사</option>
+                        <option value="마법사">마법사</option>
+                        <option value="궁수">궁수</option>
+                        <option value="도적">도적</option>
+                        <option value="해적">해적</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>전사 데미지 (%)</label>
+                    <input type="number" id="warriorDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>마법사 데미지 (%)</label>
+                    <input type="number" id="mageDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>궁수 데미지 (%)</label>
+                    <input type="number" id="archerDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>도적 데미지 (%)</label>
+                    <input type="number" id="thiefDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>해적 데미지 (%)</label>
+                    <input type="number" id="pirateDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>전직업 데미지 (%)</label>
+                    <input type="number" id="allClassDmg" class="calc-input" value="0" step="0.1">
+                </div>
+
+                <h2 class="text-xl font-bold mt-6 mb-4 text-indigo-600 border-b pb-2">기본공격 / 스킬 능력치</h2>
+                <div class="form-group">
+                    <label>기본공격 데미지 (%)</label>
+                    <input type="number" id="basicAttackDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>기본공격 크리티컬 확률 (%)</label>
+                    <input type="number" id="basicCritRate" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>기본공격 크리티컬 데미지 (%)</label>
+                    <input type="number" id="basicCritDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>스킬 데미지 (%)</label>
+                    <input type="number" id="skillDmg" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>스킬 크리티컬 확률 (%)</label>
+                    <input type="number" id="skillCritRate" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>스킬 크리티컬 데미지 (%)</label>
+                    <input type="number" id="skillCritDmg" class="calc-input" value="0" step="0.1">
+                </div>
+            </div>
+
+            <!-- Right Column: Settings and Results -->
+            <div class="flex flex-col gap-6">
+                <!-- Attack Settings -->
+                <div class="bg-white p-6 rounded-lg shadow-md border-2 border-yellow-400">
+                    <h2 class="text-xl font-bold mb-4 text-yellow-600 border-b pb-2">현재 공격 설정</h2>
+                    <div class="form-group">
+                        <label>공격 종류</label>
+                        <select id="attackType" class="calc-input bg-yellow-50">
+                            <option value="기본공격">기본공격</option>
+                            <option value="스킬">스킬</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>몬스터 종류</label>
+                        <select id="monsterType" class="calc-input bg-yellow-50">
+                            <option value="일반">일반 몬스터</option>
+                            <option value="보스">보스 몬스터</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>공격 형태</label>
+                        <select id="hitType" class="calc-input bg-yellow-50">
+                            <option value="일반">일반</option>
+                            <option value="범위">범위 피해</option>
+                            <option value="발사체">발사체 피해</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>일반공격 또는 스킬 계수 (%)</label>
+                        <input type="number" id="skillMultiplier" class="calc-input" value="100" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>일반/스킬 공격 피해량 (%)</label>
+                        <input type="number" id="attackDamagePct" class="calc-input" value="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>적이 받는 피해량 증가 (%)</label>
+                        <input type="number" id="dmgTakenInc" class="calc-input" value="0" step="0.1">
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md flex-grow">
+                    <h2 class="text-2xl font-bold mb-6 text-center text-yellow-400">데미지 계산 결과</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-gray-600 pb-2">
+                            <span class="text-gray-300">원본 공격력 (역산)</span>
+                            <span id="resOriginalAttack" class="font-bold text-lg">0</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-600 pb-2">
+                            <span class="text-gray-300">적용 크리티컬 확률</span>
+                            <span id="resCritRate" class="font-bold text-lg text-blue-300">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-600 pb-2">
+                            <span class="text-gray-300">공격속도 증가율</span>
+                            <span id="resAtkSpeed" class="font-bold text-lg text-green-300">+0%</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-600 pb-2 mt-4">
+                            <span class="text-gray-300 text-lg">노크리 데미지</span>
+                            <span id="resNoCritDmg" class="font-bold text-2xl text-orange-400">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-300 text-lg">크리티컬 데미지</span>
+                            <span id="resCritDmg" class="font-bold text-3xl text-red-400">0</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2 bg-gray-700 p-2 rounded">
+                            <span class="text-gray-200">평균 데미지 (기대값)</span>
+                            <span id="resAvgDmg" class="font-bold text-xl text-yellow-300">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cookie Helpers
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (encodeURIComponent(value) || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            }
+            return null;
+        }
+
+        const inputs = document.querySelectorAll('.calc-input');
+
+        // Load saved values from cookies
+        function loadSettings() {
+            const savedData = getCookie('mapleCalcData');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    inputs.forEach(input => {
+                        if (parsed[input.id] !== undefined) {
+                            input.value = parsed[input.id];
+                        }
+                    });
+                } catch (e) {
+                    console.error("Cookie parsing error", e);
+                }
+            }
+        }
+
+        // Save values to cookies
+        function saveSettings() {
+            const data = {};
+            inputs.forEach(input => {
+                data[input.id] = input.value;
+            });
+            setCookie('mapleCalcData', JSON.stringify(data), 30); // Save for 30 days
+        }
+
+        // Main Calculation Function
+        function calculate() {
+            // Helper to get number value safely
+            const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+            const str = (id) => document.getElementById(id).value;
+
+            // 1. 역산: 원본 공격력
+            const finalAttack = val('finalAttack');
+            const attackPct = val('attackPct');
+            const advAttackPct = val('advAttackPct');
+            
+            const originalAttack = finalAttack / ((1 + attackPct / 100) * (1 + advAttackPct / 100));
+
+            // Variables based on settings
+            const attackType = str('attackType');
+            const monsterType = str('monsterType');
+            const hitType = str('hitType');
+            const myClass = str('myClass');
+
+            // 직업 데미지
+            let myClassDmg = 0;
+            if(myClass === '전사') myClassDmg = val('warriorDmg');
+            if(myClass === '마법사') myClassDmg = val('mageDmg');
+            if(myClass === '궁수') myClassDmg = val('archerDmg');
+            if(myClass === '도적') myClassDmg = val('thiefDmg');
+            if(myClass === '해적') myClassDmg = val('pirateDmg');
+
+            const allClassDmg = val('allClassDmg');
+
+            // 공격 타입 (기본공격/스킬) 데미지
+            const typeDmg = attackType === '기본공격' ? val('basicAttackDmg') : val('skillDmg');
+            
+            // 몬스터 데미지
+            const monsterDmg = monsterType === '일반' ? val('normalMonsterDmg') : val('bossMonsterDmg');
+            
+            const allDmg = val('allDmg');
+            const skillMultiplier = val('skillMultiplier');
+            const attackDamagePct = val('attackDamagePct');
+            const dmgTakenInc = val('dmgTakenInc');
+
+            // 형태 피해량 (범위/발사체)
+            let hitTypeDmgMultiplier = 1;
+            if(hitType === '범위') hitTypeDmgMultiplier = 1 + val('aoeDmg') / 100;
+            if(hitType === '발사체') hitTypeDmgMultiplier = 1 + val('projectileDmg') / 100;
+
+            // 추가 곱연산
+            const extraAttackDamageMultiplier = 1 + attackDamagePct / 100;
+            const dmgTakenMultiplier = 1 + dmgTakenInc / 100;
+
+            // 노크리 데미지 계산식:
+            // 데미지 = 원본 공격력 * (1+공격력%) * (1+모험공격력%) * 계수 * (1+내직업+전직업) * (1+기본/스킬데미지) * (1+몬스터데미지) * (1+모든데미지) * 형태피해량 * 일반/스킬피해량 * 받는피해증가 * 0.99
+            // 참고: 원본 공격력 * (1+공격력%) * (1+모험공격력%) = 최종 공격력(finalAttack)
+            
+            const noCritDamage = finalAttack 
+                               * (skillMultiplier / 100) 
+                               * (1 + (myClassDmg + allClassDmg) / 100) 
+                               * (1 + typeDmg / 100) 
+                               * (1 + monsterDmg / 100) 
+                               * (1 + allDmg / 100) 
+                               * hitTypeDmgMultiplier 
+                               * extraAttackDamageMultiplier 
+                               * dmgTakenMultiplier 
+                               * 0.99;
+
+            // 크리티컬 확률 & 데미지
+            const typeCritRate = attackType === '기본공격' ? val('basicCritRate') : val('skillCritRate');
+            const typeCritDmg = attackType === '기본공격' ? val('basicCritDmg') : val('skillCritDmg');
+
+            let totalCritRate = val('critRate') + typeCritRate;
+            if(totalCritRate > 100) totalCritRate = 100;
+            if(totalCritRate < 0) totalCritRate = 0;
+
+            const totalCritDmg = val('critDmg') + typeCritDmg;
+
+            const critDamage = noCritDamage * (1 + totalCritDmg / 100);
+
+            // 평균 데미지
+            const avgDamage = (noCritDamage * (1 - totalCritRate/100)) + (critDamage * (totalCritRate/100));
+
+            // 공격속도
+            let atkSpeed = val('atkSpeed');
+            if(atkSpeed > 12) atkSpeed = 12;
+            if(atkSpeed < 0) atkSpeed = 0;
+            const atkSpeedBonus = atkSpeed * 20;
+
+            // Update UI
+            document.getElementById('resOriginalAttack').innerText = originalAttack.toLocaleString(undefined, {maximumFractionDigits: 1});
+            document.getElementById('resCritRate').innerText = totalCritRate.toFixed(1) + '%';
+            document.getElementById('resAtkSpeed').innerText = '+' + atkSpeedBonus + '%';
+            
+            document.getElementById('resNoCritDmg').innerText = Math.floor(noCritDamage).toLocaleString();
+            document.getElementById('resCritDmg').innerText = Math.floor(critDamage).toLocaleString();
+            document.getElementById('resAvgDmg').innerText = Math.floor(avgDamage).toLocaleString();
+
+            saveSettings();
+        }
+
+        // Add event listeners
+        inputs.forEach(input => {
+            input.addEventListener('input', calculate);
+            input.addEventListener('change', calculate);
+        });
+
+        // Initialize
+        loadSettings();
+        calculate();
+
+    </script>
+</body>
+</html>
