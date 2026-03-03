@@ -417,7 +417,6 @@
         // Unequip All Function
         function unequipAll() {
             document.querySelectorAll('.equip-select').forEach(el => el.value = '0');
-            document.querySelectorAll('input[id$="Level"], input[id$="Mult"]').forEach(el => el.value = '0');
             calculate();
         }
 
@@ -678,6 +677,35 @@
         inputs.forEach(input => {
             input.addEventListener('input', calculate);
             input.addEventListener('change', calculate);
+
+            if (input.type === 'number') {
+                // Remove leading zeros on input
+                input.addEventListener('input', function(e) {
+                    let val = e.target.value;
+                    if (val.length > 1 && val.startsWith('0') && val[1] !== '.') {
+                        e.target.value = val.replace(/^0+/, '');
+                        // If it became empty after replacing zeros, set it back to 0 so it's not totally empty if someone types '00'
+                        if (e.target.value === '') {
+                            e.target.value = '0';
+                        }
+                    }
+                });
+
+                // Clear '0' on focus
+                input.addEventListener('focus', function(e) {
+                    if (e.target.value === '0') {
+                        e.target.value = '';
+                    }
+                });
+
+                // Restore '0' if empty on blur
+                input.addEventListener('blur', function(e) {
+                    if (e.target.value === '') {
+                        e.target.value = '0';
+                        calculate();
+                    }
+                });
+            }
         });
 
         // Preset Functions
