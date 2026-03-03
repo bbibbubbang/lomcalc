@@ -35,7 +35,29 @@
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-8 font-sans">
     <div class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">단풍의 전설 데미지 계산기</h1>
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 flex-grow text-center">단풍의 전설 데미지 계산기</h1>
+            <button onclick="toggleHelp()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 ml-4 whitespace-nowrap">
+                도움말
+            </button>
+        </div>
+
+        <!-- Help Section (Hidden by default) -->
+        <div id="helpSection" class="bg-blue-50 p-6 rounded-lg shadow-md mb-6 border-2 border-blue-400" style="display: none;">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="text-xl font-bold text-blue-700">사용 방법</h2>
+                <button onclick="toggleHelp()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="text-gray-700 space-y-2">
+                <p>인게임 스텟>세부 능력치에 나와있는 값을 사이트에 기입하세요.</p>
+                <p>장비 설정은 기본적으로는 모두 해제 상태로 하시고, 건드리지 않아도 됩니다.</p>
+                <p>사용 방법 예: 마이스터링(돌파) 모의 착용 테스트 시, 반지 한자리 착용 해제 후의 스텟+전직업 데미지 60된 값으로 설정 후, 반지 슬롯의 돌파/장비 등급/장비 슬롯의 기본 능력치 증가량 설정하시면 됩니다.</p>
+                <p>무릉 연습장에서 테스트하시려면 일반몬스터로 설정해주세요.</p>
+                <p class="text-sm text-red-500 mt-2">* 참고: 무릉 연습장에는 현재 전사만 직업 데미지가 적용되는 오류가 있음. 다른 직업들은 직업/전직업 0으로 적용.</p>
+            </div>
+        </div>
 
         <!-- Equipment Selection UI -->
         <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-indigo-400">
@@ -416,6 +438,15 @@
     </div>
 
     <script>
+        function toggleHelp() {
+            const section = document.getElementById('helpSection');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
         function toggleSection(sectionId, arrowId, btnGroupId) {
             const section = document.getElementById(sectionId);
             const arrow = document.getElementById(arrowId);
