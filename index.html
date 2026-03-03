@@ -236,7 +236,7 @@
                     </div>
 
                     <h2 class="text-xl font-bold mt-6 mb-4 text-orange-600 border-b pb-2">DPS 측정 설정</h2>
-                    <div class="form-group">
+                    <div class="form-group hidden" style="display: none;">
                         <label>1초당 타격 횟수(타수)</label>
                         <input type="number" id="hitsPerSec" class="calc-input" value="1" step="0.1" min="0">
                     </div>
@@ -252,29 +252,38 @@
                     
                     <div class="space-y-4">
                         <div class="flex justify-between items-center border-b border-gray-600 pb-2">
-                            <span class="text-gray-300">원본 공격력</span>
+                            <span class="text-gray-300">기본 공격력</span>
                             <span id="resOriginalAttack" class="font-bold text-lg">0</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-gray-600 pb-2">
-                            <span class="text-gray-300">적용 크리티컬 확률</span>
-                            <span id="resCritRate" class="font-bold text-lg text-blue-300">0%</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-gray-600 pb-2 mt-4">
-                            <span class="text-gray-300">노크리 일반공격</span>
-                            <span id="resBasicNoCritDmg" class="font-bold text-xl text-orange-300">0</span>
+                            <span class="text-gray-300">노버프 크리티컬 확률</span>
+                            <span id="resNoBuffCritRate" class="font-bold text-lg text-blue-300">0%</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-gray-600 pb-2">
-                            <span class="text-gray-300">크리 일반공격</span>
-                            <span id="resBasicCritDmg" class="font-bold text-xl text-red-300">0</span>
+                            <span class="text-gray-300">버프 크리티컬 확률</span>
+                            <span id="resBuffCritRate" class="font-bold text-lg text-blue-300">0%</span>
                         </div>
-                        <div class="flex justify-between items-center border-b border-gray-600 pb-2">
-                            <span class="text-gray-300">노크리 스킬공격</span>
-                            <span id="resSkillNoCritDmg" class="font-bold text-xl text-orange-400">0</span>
+                        <div id="resBasicDmgGroup">
+                            <div class="flex justify-between items-center border-b border-gray-600 pb-2 mt-4">
+                                <span class="text-gray-300">노크리 일반공격</span>
+                                <span id="resBasicNoCritDmg" class="font-bold text-xl text-orange-300">0</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-600 pb-2">
+                                <span class="text-gray-300">크리 일반공격</span>
+                                <span id="resBasicCritDmg" class="font-bold text-xl text-red-300">0</span>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center border-b border-gray-600 pb-2">
-                            <span class="text-gray-300">크리 스킬공격</span>
-                            <span id="resSkillCritDmg" class="font-bold text-xl text-red-400">0</span>
+                        <div id="resSkillDmgGroup" style="display: none;">
+                            <div class="flex justify-between items-center border-b border-gray-600 pb-2 mt-4">
+                                <span class="text-gray-300">노크리 스킬공격</span>
+                                <span id="resSkillNoCritDmg" class="font-bold text-xl text-orange-400">0</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-600 pb-2">
+                                <span class="text-gray-300">크리 스킬공격</span>
+                                <span id="resSkillCritDmg" class="font-bold text-xl text-red-400">0</span>
+                            </div>
                         </div>
+                        <div id="resBuffList" class="mt-4 text-sm text-gray-400"></div>
                         <div class="flex justify-between items-center mt-2 bg-gray-700 p-2 rounded">
                             <span class="text-gray-200">평균 데미지 (기대값)</span>
                             <span id="resAvgDmg" class="font-bold text-xl text-yellow-300">0</span>
@@ -539,6 +548,8 @@
             };
 
             const conditionalEnabled = isChecked('equipConditional');
+            let conditionalCritRate = 0;
+            let appliedBuffs = [];
             
             for (const [id, items] of Object.entries(equipmentData)) {
                 const select = document.getElementById(id);
@@ -552,8 +563,24 @@
                         }
                     }
                     if (conditionalEnabled && selectedItem && selectedItem.conditional) {
+                        let buffTextParts = [];
                         for (const [stat, value] of Object.entries(selectedItem.conditional)) {
-                            if (eqStats[stat] !== undefined) eqStats[stat] += value * (1 + mult / 100);
+                            let statValue = value * (1 + mult / 100);
+                            if (eqStats[stat] !== undefined) eqStats[stat] += statValue;
+                            if (stat === 'critRate') conditionalCritRate += statValue;
+
+                            const statNames = {
+                                attackPct: '공격력(%)', advAttackPct: '공격력(모험)(%)', critRate: '크리티컬 확률(%)',
+                                critDmg: '크리티컬 데미지(%)', allDmg: '모든 데미지(%)', normalMonsterDmg: '일반 몬스터 데미지(%)',
+                                bossMonsterDmg: '보스 몬스터 데미지(%)', aoeDmg: '범위 피해량(%)', projectileDmg: '발사체 피해량(%)',
+                                allClassDmg: '전직업 데미지(%)', basicAttackDmg: '기본공격 데미지(%)', skillDmg: '스킬 데미지(%)',
+                                attackDamagePct: '일반/스킬 공격 피해량(%)', dmgTakenInc: '적이 받는 피해량 증가(%)'
+                            };
+                            let statName = statNames[stat] || stat;
+                            buffTextParts.push(`${statName} +${statValue}%`);
+                        }
+                        if (buffTextParts.length > 0) {
+                            appliedBuffs.push(`[${selectedItem.name}] ${buffTextParts.join(', ')}`);
                         }
                     }
                 }
@@ -642,7 +669,9 @@
             const skillAvgDamage = (skillNoCritDamage * (1 - skillTotalCritRate/100)) + (skillCritDamage * (skillTotalCritRate/100));
 
             const avgDamage = attackType === '기본공격' ? basicAvgDamage : skillAvgDamage;
-            let displayCritRate = attackType === '기본공격' ? basicTotalCritRate : skillTotalCritRate;
+            let displayTotalCritRate = attackType === '기본공격' ? basicTotalCritRate : skillTotalCritRate;
+            let buffCritRate = conditionalCritRate;
+            let noBuffCritRate = displayTotalCritRate - buffCritRate;
 
             // 공격속도
             let atkSpeed = val('atkSpeed');
@@ -659,8 +688,24 @@
 
             // Update UI
             document.getElementById('resOriginalAttack').innerText = originalAttack.toLocaleString(undefined, {maximumFractionDigits: 1});
-            document.getElementById('resCritRate').innerText = displayCritRate.toFixed(1) + '%';
+            document.getElementById('resNoBuffCritRate').innerText = noBuffCritRate.toFixed(1) + '%';
+            document.getElementById('resBuffCritRate').innerText = buffCritRate.toFixed(1) + '%';
             
+            if (attackType === '기본공격') {
+                document.getElementById('resBasicDmgGroup').style.display = 'block';
+                document.getElementById('resSkillDmgGroup').style.display = 'none';
+            } else {
+                document.getElementById('resBasicDmgGroup').style.display = 'none';
+                document.getElementById('resSkillDmgGroup').style.display = 'block';
+            }
+
+            const buffListContainer = document.getElementById('resBuffList');
+            if (appliedBuffs.length > 0) {
+                buffListContainer.innerHTML = '<div class="font-bold text-gray-300 mb-2">적용된 버프 목록:</div><ul class="list-disc pl-5">' + appliedBuffs.map(b => `<li>${b}</li>`).join('') + '</ul>';
+            } else {
+                buffListContainer.innerHTML = '';
+            }
+
             document.getElementById('resBasicNoCritDmg').innerText = Math.floor(basicNoCritDamage).toLocaleString();
             document.getElementById('resBasicCritDmg').innerText = Math.floor(basicCritDamage).toLocaleString();
             document.getElementById('resSkillNoCritDmg').innerText = Math.floor(skillNoCritDamage).toLocaleString();
