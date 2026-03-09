@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>단풍의 전설 데미지 계산기</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="item_data.js"></script>
     <style>
         input[type="number"] {
             width: 100%;
@@ -77,27 +78,27 @@
                 <div class="md:col-span-6">
                     <h3 class="font-bold text-gray-600 mb-2">1분류 (장비)</h3>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>무기</label><select id="equipWeaponType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipWeaponGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipWeaponInc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>무기</label><select id="equipWeaponType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipWeaponGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipWeaponInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipWeaponTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>방어구</label><select id="equipArmorType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipArmorGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipArmorAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipArmorInc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>방어구</label><select id="equipArmorType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipArmorGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipArmorAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipArmorInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipArmorTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>귀걸이</label><select id="equipEarringType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipEarringGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipEarringAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipEarringInc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>귀걸이</label><select id="equipEarringType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipEarringGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipEarringAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipEarringInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipEarringTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펜던트</label><select id="equipPendantType" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipPendantGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipPendantAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPendantInc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펜던트</label><select id="equipPendantType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipPendantGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipPendantAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPendantInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPendantTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 1</label><select id="equipRing1Type" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing1Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing1Inc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 1</label><select id="equipRing1Type" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing1Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing1Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipRing1Total" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 2</label><select id="equipRing2Type" class="calc-input equip-type-select"><option value="없음">없음</option><option value="일반">일반</option><option value="돌파">돌파</option></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing2Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing2Inc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 2</label><select id="equipRing2Type" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing2Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing2Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipRing2Total" class="font-bold text-indigo-600">0</span></div>
                     </div>
                 </div>
@@ -105,15 +106,15 @@
                 <div class="md:col-span-3">
                     <h3 class="font-bold text-gray-600 mb-2">2분류 (펫)</h3>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 1 공격력</label><input type="number" id="equipPet1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet1Inc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 1</label><select id="equipPet1Type" class="calc-input equip-type-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>펫 1 공격력</label><input type="number" id="equipPet1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet1Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet1Total" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 2 공격력</label><input type="number" id="equipPet2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet2Inc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 2</label><select id="equipPet2Type" class="calc-input equip-type-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>펫 2 공격력</label><input type="number" id="equipPet2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet2Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet2Total" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 3 공격력</label><input type="number" id="equipPet3Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet3Inc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 3</label><select id="equipPet3Type" class="calc-input equip-type-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>펫 3 공격력</label><input type="number" id="equipPet3Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet3Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet3Total" class="font-bold text-indigo-600">0</span></div>
                     </div>
                 </div>
@@ -474,7 +475,7 @@
             calculate();
         }
 
-        const gradeList = ["없음", "노말1", "레어", "레어1", "에픽", "에픽1", "에픽2", "유니크", "유니크1", "유니크2", "레전더리", "레전더리1", "레전더리2", "레전더리3", "레전더리4", "레전더리5", "레전더리6", "레전더리7", "레전더리8", "레전더리9", "레전더리10"];
+        const gradeList = ["없음", "레전드리", "레전드리1", "레전드리2", "레전드리3", "레전드리4", "레전드리5", "레전드리6", "레전드리7", "레전드리8", "레전드리9", "레전드리10"];
         const equipmentData = {
           "무기": { "base_atk": 50, "cumulative_percentages": [50, 100, 150, 200, 250, 300, 400, 450, 500, 800, 950, 1100, 1250, 1400, 1550, 1600, 1650, 1700, 1750, 1800] },
           "방어구": { "base_atk": 0, "cumulative_percentages": [50, 100, 150, 200, 250, 300, 400, 450, 500, 800, 950, 1100, 1250, 1400, 1550, 1600, 1650, 1700, 1750, 1800] },
@@ -497,7 +498,42 @@
             "equipRing2": "반지"
         };
 
+
+        function initEquipOptions() {
+            const categories = {
+                "equipWeaponType": "무기",
+                "equipArmorType": "방어구",
+                "equipEarringType": "귀고리",
+                "equipPendantType": "팬던트",
+                "equipRing1Type": "반지",
+                "equipRing2Type": "반지",
+                "equipPet1Type": "펫",
+                "equipPet2Type": "펫",
+                "equipPet3Type": "펫"
+            };
+
+            for (let id in categories) {
+                let select = document.getElementById(id);
+                if (select) {
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '없음';
+                    defaultOption.textContent = '없음';
+                    select.appendChild(defaultOption);
+
+                    itemDataList.filter(item => item['분류'] === categories[id]).forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item['이름'];
+                        // XSS safe textContent
+                        option.textContent = item['이름'];
+                        select.appendChild(option);
+                    });
+                }
+            }
+        }
+        initEquipOptions();
+
         function initGrades() {
+
             document.querySelectorAll('.equip-grade-select').forEach(select => {
                 gradeList.forEach((grade, index) => {
                     const option = document.createElement('option');
@@ -512,28 +548,44 @@
         function handleEquipmentChange(e) {
             if (e.target && (e.target.classList.contains('equip-type-select') || e.target.classList.contains('equip-grade-select'))) {
                 const idPrefix = e.target.id.replace(/(Type|Grade)$/, '');
-                const typeVal = document.getElementById(idPrefix + 'Type').value;
-                const gradeIndex = parseInt(document.getElementById(idPrefix + 'Grade').value);
+                const typeEl = document.getElementById(idPrefix + 'Type');
+                if (!typeEl) return;
+                const typeVal = typeEl.value;
+                const gradeEl = document.getElementById(idPrefix + 'Grade');
+                const gradeIndex = gradeEl ? parseInt(gradeEl.value) : 0; // pets don't have grades
 
                 let atkValue = 0;
 
-                if (typeVal !== '없음' && gradeIndex > 0) {
-                    const baseName = equipmentNames[idPrefix];
-                    const dataKey = typeVal === '돌파' ? '돌파' + baseName : baseName;
+                if (typeVal !== '없음') {
+                    const selectedItem = itemDataList.find(item => item['이름'] === typeVal);
+                    if (selectedItem) {
+                        if (selectedItem['분류'] === '펫') {
+                            atkValue = selectedItem['공격력'] || 0;
+                        } else if (gradeIndex > 0) {
+                            const baseName = equipmentNames[idPrefix];
+                            const dataKey = selectedItem['장비분류'] === '돌파' ? '돌파' + baseName : baseName;
 
-                    const data = equipmentData[dataKey];
-                    if (data) {
-                        const baseAtk = data.base_atk;
-                        const percentage = data.cumulative_percentages[gradeIndex - 1];
-                        atkValue = Math.round(baseAtk * (1 + percentage / 100));
+                            const data = equipmentData[dataKey];
+                            if (data) {
+                                let baseAtk = data.base_atk;
+                                if (selectedItem['공격력'] !== null && selectedItem['공격력'] !== undefined) {
+                                    baseAtk = parseFloat(selectedItem['공격력']);
+                                }
+
+                                // mapping for new gradeList: gradeIndex 1 (레전드리) corresponds to index 9 (800%) in cumulative_percentages
+                                const mappedIndex = gradeIndex + 8;
+                                const percentage = data.cumulative_percentages[mappedIndex];
+                                atkValue = Math.round(baseAtk * (1 + percentage / 100));
+                            }
+                        }
                     }
                 }
 
-                document.getElementById(idPrefix + 'Atk').value = atkValue;
+                const atkEl = document.getElementById(idPrefix + 'Atk');
+                if (atkEl) atkEl.value = atkValue;
                 calculate();
             }
         }
-
         document.addEventListener('change', handleEquipmentChange);
 
         function unequipAll() {
@@ -672,13 +724,127 @@
                 basicAttackDmg: 0,
                 skillDmg: 0,
                 attackDamagePct: 0,
-                dmgTakenInc: 0
+                dmgTakenInc: 0,
+
+                // Add missing stats here
+                warriorDmg: 0,
+                mageDmg: 0,
+                archerDmg: 0,
+                thiefDmg: 0,
+                pirateDmg: 0,
+                basicCritRate: 0,
+                basicCritDmg: 0,
+                skillCritRate: 0,
+                skillCritDmg: 0,
+                autoAttackPct: 0,
+                atkSpeedBonus: 0,
+                baseHitMulti: 0,
+                hitDmgPct: 0
             };
 
             let conditionalCritRate = 0;
             let appliedBuffs = [];
 
+
+            // Helper for applying item stats
+            const applyItemStat = (statName, statValue, isBuff, duration, cooldown, isInfDuration) => {
+                if (!statName || statValue === null || statValue === undefined) return;
+
+                let uptime = 1;
+                const dpsT = val('dpsTime');
+
+                if (isBuff) {
+                    if (isInfDuration || duration === -1) {
+                        uptime = 1;
+                    } else if (cooldown === -1) {
+                        uptime = Math.min(1, duration / dpsT);
+                    } else if (cooldown > 0 && duration > 0) {
+                        const fullCycles = Math.floor(dpsT / cooldown);
+                        const remainder = dpsT % cooldown;
+                        const activeTime = (fullCycles * duration) + Math.min(duration, remainder);
+                        uptime = activeTime / dpsT;
+                    }
+                    if (uptime > 0 && !appliedBuffs.includes(statName)) {
+                        appliedBuffs.push(statName);
+                    }
+                }
+
+                const effectiveValue = statValue * uptime;
+
+                if (statName === '공격력%') eqStats.attackPct += effectiveValue;
+                else if (statName === '공격력(모험)%') eqStats.advAttackPct += effectiveValue;
+                else if (statName === '크리티컬 확률%') eqStats.critRate += effectiveValue;
+                else if (statName === '크리티컬 데미지%' || statName === '크리티컬 피해량%') eqStats.critDmg += effectiveValue;
+                else if (statName === '모든 데미지%') eqStats.allDmg += effectiveValue;
+                else if (statName === '일반 몬스터 데미지%') eqStats.normalMonsterDmg += effectiveValue;
+                else if (statName === '보스 몬스터 데미지%') eqStats.bossMonsterDmg += effectiveValue;
+                else if (statName === '범위 피해량%' || statName === '공격범위/피해량%') eqStats.aoeDmg += effectiveValue;
+                else if (statName === '발사체 피해량%') eqStats.projectileDmg += effectiveValue;
+                else if (statName === '전직업 데미지%') eqStats.allClassDmg += effectiveValue;
+                else if (statName === '기본공격 데미지%' || statName === '기본공격 피해량%') eqStats.basicAttackDmg += effectiveValue;
+                else if (statName === '스킬 데미지%' || statName === '공격스킬 피해량%') eqStats.skillDmg += effectiveValue;
+                else if (statName === '일반/스킬 공격 피해량%') eqStats.attackDamagePct += effectiveValue;
+                else if (statName === '적이 받는 피해량 증가%' || statName === '적이 받는 피해 증가%') eqStats.dmgTakenInc += effectiveValue;
+                // Newly added missing stats
+                else if (statName === '전사 데미지%') eqStats.warriorDmg += effectiveValue;
+                else if (statName === '마법사 데미지%') eqStats.mageDmg += effectiveValue;
+                else if (statName === '궁수 데미지%') eqStats.archerDmg += effectiveValue;
+                else if (statName === '도적 데미지%') eqStats.thiefDmg += effectiveValue;
+                else if (statName === '해적 데미지%') eqStats.pirateDmg += effectiveValue;
+                else if (statName === '기본공격 크리티컬 확률%') eqStats.basicCritRate += effectiveValue;
+                else if (statName === '기본공격 크리티컬 데미지%') eqStats.basicCritDmg += effectiveValue;
+                else if (statName === '스킬 크리티컬 확률%') eqStats.skillCritRate += effectiveValue;
+                else if (statName === '스킬 크리티컬 데미지%') eqStats.skillCritDmg += effectiveValue;
+                else if (statName === '오토 시 공격력%') eqStats.autoAttackPct += effectiveValue;
+                else if (statName === '공격속도') eqStats.atkSpeedBonus += effectiveValue;
+                else if (statName === '기본 타수(배)') eqStats.baseHitMulti += effectiveValue;
+                else if (statName === '타수 당 피해량%') eqStats.hitDmgPct += effectiveValue;
+
+            };
+
+            // Apply Equipment Stats
+            const equipIds = ['equipWeapon', 'equipArmor', 'equipEarring', 'equipPendant', 'equipRing1', 'equipRing2', 'equipPet1', 'equipPet2', 'equipPet3'];
+            equipIds.forEach(idPrefix => {
+                const typeEl = document.getElementById(idPrefix + 'Type');
+                if (!typeEl || typeEl.value === '없음') return;
+
+                const item = itemDataList.find(i => i['이름'] === typeEl.value);
+                if (!item) return;
+
+                const gradeEl = document.getElementById(idPrefix + 'Grade');
+                // index 0: 없음, 1: 레전드리, 2: 레전드리1, 3: 레전드리2, 4: 레전드리3, 5: 레전드리4, 6: 레전드리5, 11: 레전드리10
+                const gradeIndex = gradeEl ? parseInt(gradeEl.value) : 0;
+
+                const duration = item['버프 지속시간(초)\n// -1인 경우 무한'];
+                const cooldown = item['버프 쿨타임(초)\n// -1:0초부터 1회만 발동'];
+
+                // check for infinite duration modifier (e.g. Dominator Pendant at grade >= 6)
+                let isInfDuration = false;
+                if (gradeIndex >= 6 && item['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'] === -1) {
+                    isInfDuration = true;
+                }
+
+                applyItemStat(item['부가스텟명1'], item['부가스텟1'], false, 0, 0, false);
+                applyItemStat(item['부가스텟명2'], item['부가스텟2'], false, 0, 0, false);
+                applyItemStat(item['버프스텟명1'], item['버프스텟1'], true, duration, cooldown, isInfDuration);
+                applyItemStat(item['버프스텟명2'], item['버프스텟2'], true, duration, cooldown, isInfDuration);
+
+                if (gradeIndex >= 4) { // 레전드리3
+                    applyItemStat(item['레전드리3 부가스텟명'], item['레전드리3 부가스텟'], false, 0, 0, false);
+                }
+                if (gradeIndex >= 6) { // 레전드리5
+                    const l5Stat = item['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'];
+                    if (l5Stat !== -1) {
+                        applyItemStat(item['레전드리5 버프스텟명'], l5Stat, true, duration, cooldown, isInfDuration);
+                    }
+                }
+                if (gradeIndex >= 11) { // 레전드리10
+                    applyItemStat(item['레전드리10 부가스텟명'], item['레전드리10 부가스텟'], false, 0, 0, false);
+                }
+            });
+
             // Apply Artifact stats
+
             eqStats.attackPct += val('artifact_0') + val('artifact_9');
             eqStats.normalMonsterDmg += val('artifact_2');
             eqStats.basicAttackDmg += val('artifact_3');
@@ -687,7 +853,7 @@
             eqStats.allDmg += val('artifact_12');
 
             // Apply equipment stats
-            attackPct += eqStats.attackPct;
+            attackPct += eqStats.attackPct + eqStats.autoAttackPct;
             advAttackPct += eqStats.advAttackPct;
 
             // Recalculate finalAttack with equipment
@@ -701,11 +867,11 @@
 
             // 직업 데미지
             let myClassDmg = 0;
-            if(myClass === '전사') myClassDmg = val('warriorDmg') + val('artifact_4');
-            if(myClass === '마법사') myClassDmg = val('mageDmg') + val('artifact_5');
-            if(myClass === '궁수') myClassDmg = val('archerDmg') + val('artifact_6');
-            if(myClass === '도적') myClassDmg = val('thiefDmg') + val('artifact_7');
-            if(myClass === '해적') myClassDmg = val('pirateDmg') + val('artifact_8');
+            if(myClass === '전사') myClassDmg = val('warriorDmg') + val('artifact_4') + eqStats.warriorDmg;
+            if(myClass === '마법사') myClassDmg = val('mageDmg') + val('artifact_5') + eqStats.mageDmg;
+            if(myClass === '궁수') myClassDmg = val('archerDmg') + val('artifact_6') + eqStats.archerDmg;
+            if(myClass === '도적') myClassDmg = val('thiefDmg') + val('artifact_7') + eqStats.thiefDmg;
+            if(myClass === '해적') myClassDmg = val('pirateDmg') + val('artifact_8') + eqStats.pirateDmg;
 
             const allClassDmg = val('allClassDmg') + eqStats.allClassDmg;
             
@@ -745,10 +911,10 @@
             const baseCritRate = val('critRate') + eqStats.critRate;
             const baseCritDmg = val('critDmg') + eqStats.critDmg;
 
-            const basicCritRateAdded = val('basicCritRate');
-            const basicCritDmgAdded = val('basicCritDmg');
-            const skillCritRateAdded = val('skillCritRate');
-            const skillCritDmgAdded = val('skillCritDmg');
+            const basicCritRateAdded = val('basicCritRate') + eqStats.basicCritRate;
+            const basicCritDmgAdded = val('basicCritDmg') + eqStats.basicCritDmg;
+            const skillCritRateAdded = val('skillCritRate') + eqStats.skillCritRate;
+            const skillCritDmgAdded = val('skillCritDmg') + eqStats.skillCritDmg;
 
             let basicTotalCritRate = baseCritRate + basicCritRateAdded;
             if(basicTotalCritRate > 100) basicTotalCritRate = 100;
@@ -780,6 +946,7 @@
             }
             let atkSpeed = val('atkSpeed');
             atkSpeed += (val('artifact_1') * Math.min(val('artifact_1_time'), val('dpsTime'))) / val('dpsTime');
+            atkSpeed += eqStats.atkSpeedBonus;
             if(atkSpeed > 12) atkSpeed = 12;
             if(atkSpeed < 1) atkSpeed = 1;
             const atkSpeedBonus = atkSpeed * 20;
@@ -788,7 +955,11 @@
             const hitsPerSec = val('hitsPerSec');
             const dpsTime = val('dpsTime');
             const finalHitsPerSec = attackType === '스킬' ? hitsPerSec : hitsPerSec * (1 + atkSpeedBonus / 100);
-            const avgDPS = avgDamage * finalHitsPerSec;
+
+            let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
+            let hitDmgMulti = eqStats.hitDmgPct > 0 ? (eqStats.hitDmgPct / 100) : 1;
+            const avgDPS = (avgDamage * hitDmgMulti) * (finalHitsPerSec * hitMulti);
+
             const totalDmg = avgDPS * dpsTime;
 
             // Update UI
