@@ -7,6 +7,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="item_data.js"></script>
     <style>
+        @font-face {
+            font-family: 'Maplestory';
+            src: url('font/Maplestory Light.ttf') format('truetype');
+            font-weight: normal;
+        }
+        @font-face {
+            font-family: 'Maplestory';
+            src: url('font/Maplestory Bold.ttf') format('truetype');
+            font-weight: bold;
+        }
+        .font-maplestory {
+            font-family: 'Maplestory', sans-serif !important;
+        }
         input[type="number"] {
             width: 100%;
             padding: 0.5rem;
@@ -41,6 +54,28 @@
             <button onclick="toggleHelp()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 ml-4 whitespace-nowrap">
                 도움말
             </button>
+            <button onclick="toggleSettings()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 ml-2 whitespace-nowrap">
+                설정
+            </button>
+        </div>
+
+        <!-- Settings Section (Hidden by default) -->
+        <div id="settingsSection" class="bg-gray-50 p-6 rounded-lg shadow-md mb-6 border-2 border-gray-400" style="display: none;">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 class="text-xl font-bold text-gray-700">설정</h2>
+                <button onclick="toggleSettings()" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label>폰트 설정</label>
+                    <select id="fontSelect" class="calc-input" onchange="changeFont()">
+                        <option value="기본">기본</option>
+                        <option value="메이플스토리">메이플스토리</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- Help Section (Hidden by default) -->
@@ -78,27 +113,27 @@
                 <div class="md:col-span-6">
                     <h3 class="font-bold text-gray-600 mb-2">1분류 (장비)</h3>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>무기</label><select id="equipWeaponType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipWeaponGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipWeaponInc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>무기</label><select id="equipWeaponType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipWeaponGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipWeaponInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipWeaponTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>방어구</label><select id="equipArmorType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipArmorGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipArmorAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipArmorInc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>방어구</label><select id="equipArmorType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipArmorGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipArmorAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipArmorInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipArmorTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>귀걸이</label><select id="equipEarringType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipEarringGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipEarringAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipEarringInc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>귀걸이</label><select id="equipEarringType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipEarringGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipEarringAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipEarringInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipEarringTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펜던트</label><select id="equipPendantType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipPendantGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipPendantAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPendantInc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펜던트</label><select id="equipPendantType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipPendantGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipPendantAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPendantInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPendantTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 1</label><select id="equipRing1Type" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing1Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing1Inc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 1</label><select id="equipRing1Type" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing1Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipRing1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing1Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipRing1Total" class="font-bold text-indigo-600">0</span></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
-                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 2</label><select id="equipRing2Type" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing2Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0"><label>공격력</label><input type="number" id="equipRing2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing2Inc" class="calc-input" value="0"></div></div>
+                        <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 2</label><select id="equipRing2Type" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing2Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipRing2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing2Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipRing2Total" class="font-bold text-indigo-600">0</span></div>
                     </div>
                 </div>
@@ -449,6 +484,24 @@
             }
         }
 
+        function toggleSettings() {
+            const section = document.getElementById('settingsSection');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function changeFont() {
+            const fontSelect = document.getElementById('fontSelect');
+            if (fontSelect && fontSelect.value === '메이플스토리') {
+                document.body.classList.add('font-maplestory');
+            } else {
+                document.body.classList.remove('font-maplestory');
+            }
+        }
+
         function toggleSection(sectionId, arrowId, btnGroupId) {
             const section = document.getElementById(sectionId);
             const arrow = document.getElementById(arrowId);
@@ -475,7 +528,7 @@
             calculate();
         }
 
-        const gradeList = ["없음", "레전드리", "레전드리1", "레전드리2", "레전드리3", "레전드리4", "레전드리5", "레전드리6", "레전드리7", "레전드리8", "레전드리9", "레전드리10"];
+        const gradeList = ["레전드리", "레전드리1", "레전드리2", "레전드리3", "레전드리4", "레전드리5", "레전드리6", "레전드리7", "레전드리8", "레전드리9", "레전드리10"];
         const equipmentData = {
           "무기": { "base_atk": 50, "cumulative_percentages": [50, 100, 150, 200, 250, 300, 400, 450, 500, 800, 950, 1100, 1250, 1400, 1550, 1600, 1650, 1700, 1750, 1800] },
           "방어구": { "base_atk": 0, "cumulative_percentages": [50, 100, 150, 200, 250, 300, 400, 450, 500, 800, 950, 1100, 1250, 1400, 1550, 1600, 1650, 1700, 1750, 1800] },
@@ -537,7 +590,7 @@
             document.querySelectorAll('.equip-grade-select').forEach(select => {
                 gradeList.forEach((grade, index) => {
                     const option = document.createElement('option');
-                    option.value = index;
+                    option.value = index + 1;
                     option.textContent = grade;
                     select.appendChild(option);
                 });
@@ -590,7 +643,7 @@
 
         function unequipAll() {
             document.querySelectorAll('.equip-type-select').forEach(el => el.value = '없음');
-            document.querySelectorAll('.equip-grade-select').forEach(el => el.value = '0');
+            document.querySelectorAll('.equip-grade-select').forEach(el => el.value = '1');
             document.querySelectorAll('input[id$="Atk"]').forEach(el => el.value = '0');
             document.querySelectorAll('input[id$="Inc"]').forEach(el => el.value = '0');
             calculate();
@@ -1141,6 +1194,7 @@
 
         // Initialize
         loadSettings();
+        changeFont(); // Apply font loaded from cookie
         calculate();
         renderPresets();
 
