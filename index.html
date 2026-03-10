@@ -421,12 +421,12 @@
                                 <span id="resSkillCritDmg" class="font-bold text-xl text-red-400">0</span>
                             </div>
                         </div>
-                                                <div id="resBuffList" class="text-sm text-gray-400"></div>
                         <div class="mt-4 border-t border-gray-600 pt-4">
                             <label class="flex items-center space-x-2 text-gray-300 cursor-pointer">
                                 <input type="checkbox" id="showBuffItems" class="form-checkbox h-4 w-4 text-yellow-500 rounded bg-gray-700 border-gray-500">
                                 <span>버프 적용 아이템 표시</span>
                             </label>
+                            <div id="resBuffList" class="mt-2 text-sm text-gray-400"></div>
                             <div id="resBuffItemList" class="mt-2 text-sm text-gray-400 space-y-2" style="display: none;"></div>
                         </div>
                         <div class="flex justify-between items-center bg-gray-700 p-2 rounded">
@@ -1051,11 +1051,17 @@
                 document.getElementById('resSkillDmgGroup').style.display = 'block';
             }
 
+            const showBuffItemsChecked = document.getElementById('showBuffItems').checked;
             const buffListContainer = document.getElementById('resBuffList');
             if (appliedBuffs.length > 0) {
                 buffListContainer.innerHTML = '<div class="font-bold text-gray-300 mb-2">적용된 버프 목록:</div><ul class="list-disc pl-5">' + appliedBuffs.map(b => `<li>${b}</li>`).join('') + '</ul>';
             } else {
                 buffListContainer.innerHTML = '';
+            }
+            if (showBuffItemsChecked) {
+                buffListContainer.style.display = 'none';
+            } else {
+                buffListContainer.style.display = 'block';
             }
 
             const buffItemListContainer = document.getElementById('resBuffItemList');
@@ -1249,10 +1255,13 @@
 
         document.getElementById('showBuffItems').addEventListener('change', function(e) {
             const buffItemListContainer = document.getElementById('resBuffItemList');
+            const buffListContainer = document.getElementById('resBuffList');
             if (e.target.checked) {
                 buffItemListContainer.style.display = 'block';
+                buffListContainer.style.display = 'none';
             } else {
                 buffItemListContainer.style.display = 'none';
+                buffListContainer.style.display = 'block';
             }
         });
 
