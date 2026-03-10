@@ -216,9 +216,18 @@
             </div>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Left Column: Stats 1 -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-purple-400">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <div class="flex items-center cursor-pointer" onclick="toggleSection('manualStatsSection', 'manualStatsArrow')">
+                    <h2 class="text-xl font-bold text-purple-600">직접 입력 데미지 설정</h2>
+                    <span id="manualStatsArrow" class="ml-2 text-purple-600">▶</span>
+                </div>
+            </div>
+
+            <div id="manualStatsSection" style="display: none;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Left Column: Stats 1 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                 <h2 class="text-xl font-bold mb-4 text-blue-600 border-b pb-2">기본 능력치</h2>
                 <div class="form-group">
                     <label>최종 공격력</label>
@@ -276,8 +285,8 @@
                 </div>
             </div>
 
-            <!-- Middle Column: Stats 2 -->
-            <div class="bg-white p-6 rounded-lg shadow-md">
+                    <!-- Middle Column: Stats 2 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                 <h2 class="text-xl font-bold mb-4 text-green-600 border-b pb-2">직업별 데미지</h2>
                 <div class="form-group">
                     <label>내 직업 선택</label>
@@ -341,11 +350,11 @@
                 </div>
             </div>
 
-            <!-- Right Column: Settings and Results -->
-            <div class="flex flex-col gap-6">
-                <!-- Attack Settings -->
-                <div class="bg-white p-6 rounded-lg shadow-md border-2 border-yellow-400">
-                    <h2 class="text-xl font-bold mb-4 text-yellow-600 border-b pb-2">현재 공격 설정</h2>
+                    <!-- Right Column: Settings and Results -->
+                    <div class="flex flex-col gap-6">
+                        <!-- Attack Settings -->
+                        <div class="bg-white p-6 rounded-lg shadow-md border-2 border-yellow-400">
+                            <h2 class="text-xl font-bold mb-4 text-yellow-600 border-b pb-2">현재 공격 설정</h2>
                     <div class="form-group">
                         <label>공격 종류</label>
                         <select id="attackType" class="calc-input bg-yellow-50">
@@ -382,11 +391,15 @@
                         <label>딜 측정 시간(초)</label>
                         <input type="number" id="dpsTime" class="calc-input" value="10" step="1" min="1">
                     </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Results -->
-                <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md flex-grow">
-                    <h2 class="text-2xl font-bold mb-6 text-center text-yellow-400">데미지 계산 결과</h2>
+        <!-- Results -->
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-6 text-center text-yellow-400">데미지 계산 결과</h2>
                     
                     <div class="space-y-4">
                         <div class="flex justify-between items-center border-b border-gray-600 pb-2">
@@ -440,6 +453,60 @@
                         <div class="flex justify-between items-center bg-gray-900 p-3 rounded-lg border border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
                             <span class="text-red-400 font-bold text-lg">최종 총 데미지</span>
                             <span id="resTotalDmg" class="font-bold text-2xl text-red-400">0</span>
+                        </div>
+                    </div>
+                </div>
+
+        <!-- Real Stats Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-teal-400">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <div class="flex items-center cursor-pointer" onclick="toggleSection('realStatsSection', 'realStatsArrow')">
+                    <h2 class="text-xl font-bold text-teal-600">실제 능력치</h2>
+                    <span id="realStatsArrow" class="ml-2 text-teal-600">▼</span>
+                </div>
+            </div>
+
+            <div id="realStatsSection">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Column 1: Base & Class -->
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 class="font-bold text-blue-600 border-b pb-1 mb-2">기본 및 직업</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span class="text-gray-600">최종 공격력</span><span id="realFinalAttack" class="font-bold">0</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">공격력 (%)</span><span id="realAttackPct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">공격력(모험) (%)</span><span id="realAdvAttackPct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">공격속도 단계</span><span id="realAtkSpeed" class="font-bold">1</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">선택 직업 데미지 (%)</span><span id="realMyClassDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">전직업 데미지 (%)</span><span id="realAllClassDmg" class="font-bold">0%</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Monster & Type -->
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 class="font-bold text-purple-600 border-b pb-1 mb-2">몬스터 및 기타 형태</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span class="text-gray-600">모든 데미지 (%)</span><span id="realAllDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">일반 몬스터 데미지 (%)</span><span id="realNormalMonsterDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">보스 몬스터 데미지 (%)</span><span id="realBossMonsterDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">범위 피해량 (%)</span><span id="realAoeDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">발사체 피해량 (%)</span><span id="realProjectileDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">일반/스킬 공격 피해량 (%)</span><span id="realAttackDamagePct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">적이 받는 피해량 증가 (%)</span><span id="realDmgTakenInc" class="font-bold">0%</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Column 3: Attack Types & Crit -->
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 class="font-bold text-red-600 border-b pb-1 mb-2">크리티컬 및 공격스킬</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span class="text-gray-600">기본 크리티컬 확률 (%)</span><span id="realCritRate" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본 크리티컬 데미지 (%)</span><span id="realCritDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본공격 데미지 (%)</span><span id="realBasicAttackDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본공격 크리 확률 (%)</span><span id="realBasicCritRate" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본공격 크리 데미지 (%)</span><span id="realBasicCritDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">스킬 데미지 (%)</span><span id="realSkillDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">스킬 크리 확률 (%)</span><span id="realSkillCritRate" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">스킬 크리 데미지 (%)</span><span id="realSkillCritDmg" class="font-bold">0%</span></div>
                         </div>
                     </div>
                 </div>
@@ -1101,6 +1168,31 @@
 
             document.getElementById('resAvgDPS').innerText = Math.floor(avgDPS).toLocaleString();
             document.getElementById('resTotalDmg').innerText = Math.floor(totalDmg).toLocaleString();
+
+            // Update Real Stats Section
+            document.getElementById('realFinalAttack').innerText = Math.floor(finalAttack).toLocaleString();
+            document.getElementById('realAttackPct').innerText = attackPct.toFixed(1) + '%';
+            document.getElementById('realAdvAttackPct').innerText = advAttackPct.toFixed(1) + '%';
+            document.getElementById('realAtkSpeed').innerText = atkSpeed.toFixed(1);
+            document.getElementById('realMyClassDmg').innerText = myClassDmg.toFixed(1) + '%';
+            document.getElementById('realAllClassDmg').innerText = allClassDmg.toFixed(1) + '%';
+
+            document.getElementById('realAllDmg').innerText = allDmg.toFixed(1) + '%';
+            document.getElementById('realNormalMonsterDmg').innerText = (val('normalMonsterDmg') + eqStats.normalMonsterDmg).toFixed(1) + '%';
+            document.getElementById('realBossMonsterDmg').innerText = (val('bossMonsterDmg') + eqStats.bossMonsterDmg).toFixed(1) + '%';
+            document.getElementById('realAoeDmg').innerText = (val('aoeDmg') + eqStats.aoeDmg).toFixed(1) + '%';
+            document.getElementById('realProjectileDmg').innerText = (val('projectileDmg') + eqStats.projectileDmg).toFixed(1) + '%';
+            document.getElementById('realAttackDamagePct').innerText = attackDamagePct.toFixed(1) + '%';
+            document.getElementById('realDmgTakenInc').innerText = dmgTakenInc.toFixed(1) + '%';
+
+            document.getElementById('realCritRate').innerText = baseCritRate.toFixed(1) + '%';
+            document.getElementById('realCritDmg').innerText = baseCritDmg.toFixed(1) + '%';
+            document.getElementById('realBasicAttackDmg').innerText = basicTypeDmg.toFixed(1) + '%';
+            document.getElementById('realBasicCritRate').innerText = basicTotalCritRate.toFixed(1) + '%';
+            document.getElementById('realBasicCritDmg').innerText = basicTotalCritDmg.toFixed(1) + '%';
+            document.getElementById('realSkillDmg').innerText = skillTypeDmg.toFixed(1) + '%';
+            document.getElementById('realSkillCritRate').innerText = skillTotalCritRate.toFixed(1) + '%';
+            document.getElementById('realSkillCritDmg').innerText = skillTotalCritDmg.toFixed(1) + '%';
 
             saveSettings();
         }
