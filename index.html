@@ -421,7 +421,14 @@
                                 <span id="resSkillCritDmg" class="font-bold text-xl text-red-400">0</span>
                             </div>
                         </div>
-                        <div id="resBuffList" class="text-sm text-gray-400"></div>
+                                                <div id="resBuffList" class="text-sm text-gray-400"></div>
+                        <div class="mt-4 border-t border-gray-600 pt-4">
+                            <label class="flex items-center space-x-2 text-gray-300 cursor-pointer">
+                                <input type="checkbox" id="showBuffItems" class="form-checkbox h-4 w-4 text-yellow-500 rounded bg-gray-700 border-gray-500">
+                                <span>버프 적용 아이템 표시</span>
+                            </label>
+                            <div id="resBuffItemList" class="mt-2 text-sm text-gray-400 space-y-2" style="display: none;"></div>
+                        </div>
                         <div class="flex justify-between items-center bg-gray-700 p-2 rounded">
                             <span class="text-gray-200">평균 데미지 (기대값)</span>
                             <span id="resAvgDmg" class="font-bold text-xl text-yellow-300">0</span>
@@ -792,15 +799,16 @@
                 autoAttackPct: 0,
                 atkSpeedBonus: 0,
                 baseHitMulti: 0,
-                hitDmgPct: 0
+                hitDmgMulti: 1
             };
 
             let conditionalCritRate = 0;
             let appliedBuffs = [];
+            let appliedBuffItems = {};
 
 
             // Helper for applying item stats
-            const applyItemStat = (statName, statValue, isBuff, duration, cooldown, isInfDuration) => {
+            const applyItemStat = (statName, statValue, isBuff, duration, cooldown, isInfDuration, itemName) => {
                 if (!statName || statValue === null || statValue === undefined) return;
 
                 let uptime = 1;
@@ -817,8 +825,18 @@
                         const activeTime = (fullCycles * duration) + Math.min(duration, remainder);
                         uptime = activeTime / dpsT;
                     }
-                    if (uptime > 0 && !appliedBuffs.includes(statName)) {
-                        appliedBuffs.push(statName);
+                    if (uptime > 0) {
+                        if (!appliedBuffs.includes(statName)) {
+                            appliedBuffs.push(statName);
+                        }
+                        if (itemName) {
+                            if (!appliedBuffItems[statName]) {
+                                appliedBuffItems[statName] = [];
+                            }
+                            // Calculate effective buff stat for the display
+                            const effectiveStat = statValue * uptime;
+                            appliedBuffItems[statName].push({ name: itemName, value: effectiveStat });
+                        }
                     }
                 }
 
@@ -851,7 +869,7 @@
                 else if (statName === '오토 시 공격력%') eqStats.autoAttackPct += effectiveValue;
                 else if (statName === '공격속도') eqStats.atkSpeedBonus += effectiveValue;
                 else if (statName === '기본 타수(배)') eqStats.baseHitMulti += effectiveValue;
-                else if (statName === '타수 당 피해량%') eqStats.hitDmgPct += effectiveValue;
+                else if (statName === '타수 당 피해량%') eqStats.hitDmgMulti *= (1 + effectiveValue / 100);
 
             };
 
@@ -877,22 +895,22 @@
                     isInfDuration = true;
                 }
 
-                applyItemStat(item['부가스텟명1'], item['부가스텟1'], false, 0, 0, false);
-                applyItemStat(item['부가스텟명2'], item['부가스텟2'], false, 0, 0, false);
-                applyItemStat(item['버프스텟명1'], item['버프스텟1'], true, duration, cooldown, isInfDuration);
-                applyItemStat(item['버프스텟명2'], item['버프스텟2'], true, duration, cooldown, isInfDuration);
+                applyItemStat(item['부가스텟명1'], item['부가스텟1'], false, 0, 0, false, item['이름']);
+                applyItemStat(item['부가스텟명2'], item['부가스텟2'], false, 0, 0, false, item['이름']);
+                applyItemStat(item['버프스텟명1'], item['버프스텟1'], true, duration, cooldown, isInfDuration, item['이름']);
+                applyItemStat(item['버프스텟명2'], item['버프스텟2'], true, duration, cooldown, isInfDuration, item['이름']);
 
                 if (gradeIndex >= 4) { // 레전드리3
-                    applyItemStat(item['레전드리3 부가스텟명'], item['레전드리3 부가스텟'], false, 0, 0, false);
+                    applyItemStat(item['레전드리3 부가스텟명'], item['레전드리3 부가스텟'], false, 0, 0, false, item['이름']);
                 }
                 if (gradeIndex >= 6) { // 레전드리5
                     const l5Stat = item['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'];
                     if (l5Stat !== -1) {
-                        applyItemStat(item['레전드리5 버프스텟명'], l5Stat, true, duration, cooldown, isInfDuration);
+                        applyItemStat(item['레전드리5 버프스텟명'], l5Stat, true, duration, cooldown, isInfDuration, item['이름']);
                     }
                 }
                 if (gradeIndex >= 11) { // 레전드리10
-                    applyItemStat(item['레전드리10 부가스텟명'], item['레전드리10 부가스텟'], false, 0, 0, false);
+                    applyItemStat(item['레전드리10 부가스텟명'], item['레전드리10 부가스텟'], false, 0, 0, false, item['이름']);
                 }
             });
 
@@ -1010,7 +1028,7 @@
             const finalHitsPerSec = attackType === '스킬' ? hitsPerSec : hitsPerSec * (1 + atkSpeedBonus / 100);
 
             let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
-            let hitDmgMulti = eqStats.hitDmgPct > 0 ? (eqStats.hitDmgPct / 100) : 1;
+            let hitDmgMulti = eqStats.hitDmgMulti;
             const avgDPS = (avgDamage * hitDmgMulti) * (finalHitsPerSec * hitMulti);
 
             const totalDmg = avgDPS * dpsTime;
@@ -1033,6 +1051,38 @@
                 buffListContainer.innerHTML = '<div class="font-bold text-gray-300 mb-2">적용된 버프 목록:</div><ul class="list-disc pl-5">' + appliedBuffs.map(b => `<li>${b}</li>`).join('') + '</ul>';
             } else {
                 buffListContainer.innerHTML = '';
+            }
+
+            const buffItemListContainer = document.getElementById('resBuffItemList');
+            if (Object.keys(appliedBuffItems).length > 0) {
+                let html = '';
+                for (const [statName, items] of Object.entries(appliedBuffItems)) {
+                    html += `<div class="mt-2"><div class="font-bold text-gray-300">${statName}</div><ul class="list-none pl-2">`;
+
+                    // Group by item name to sum values from multiple stats of the same item
+                    const itemSums = {};
+                    items.forEach(item => {
+                        if (itemSums[item.name]) {
+                            itemSums[item.name] += item.value;
+                        } else {
+                            itemSums[item.name] = item.value;
+                        }
+                    });
+
+                    for (const [itemName, value] of Object.entries(itemSums)) {
+                        let valStr = `${value}`;
+                        if (statName.includes('%')) valStr += '%';
+                        if (statName.includes('배')) valStr += '배';
+                        // escape XSS:
+                        const safeItemName = document.createElement('div');
+                        safeItemName.textContent = itemName;
+                        html += `<li>- ${safeItemName.innerHTML}: ${valStr}</li>`;
+                    }
+                    html += `</ul></div>`;
+                }
+                buffItemListContainer.innerHTML = html;
+            } else {
+                buffItemListContainer.innerHTML = '';
             }
 
             document.getElementById('resBasicNoCritDmg').innerText = Math.floor(basicNoCritDamage).toLocaleString();
@@ -1191,6 +1241,15 @@
 
         // Event listener for filter
         document.getElementById('presetFilter')?.addEventListener('change', renderPresets);
+
+        document.getElementById('showBuffItems').addEventListener('change', function(e) {
+            const buffItemListContainer = document.getElementById('resBuffItemList');
+            if (e.target.checked) {
+                buffItemListContainer.style.display = 'block';
+            } else {
+                buffItemListContainer.style.display = 'none';
+            }
+        });
 
         // Initialize
         loadSettings();
