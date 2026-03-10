@@ -262,7 +262,7 @@
                     <input type="number" id="basicAttackDamagePct" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
-                    <label>공격스킬 피해량 (%)</label>
+                    <label>스킬 피해량 (%)</label>
                     <input type="number" id="skillAttackDamagePct" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
@@ -481,8 +481,8 @@
                             <div class="flex justify-between"><span class="text-gray-600">최종 공격력</span><span id="realFinalAttack" class="font-bold">0</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격력 (%)</span><span id="realAttackPct" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격력(모험) (%)</span><span id="realAdvAttackPct" class="font-bold">0%</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">공격속도 단계</span><span id="realAtkSpeed" class="font-bold">1</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">선택 직업 데미지 (%)</span><span id="realMyClassDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">공격속도</span><span id="realAtkSpeed" class="font-bold">1</span></div>
+                            <div class="flex justify-between"><span id="myClassDmgLabel" class="text-gray-600">선택 직업 데미지 (%)</span><span id="realMyClassDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">전직업 데미지 (%)</span><span id="realAllClassDmg" class="font-bold">0%</span></div>
                         </div>
                     </div>
@@ -497,7 +497,7 @@
                             <div class="flex justify-between"><span class="text-gray-600">범위 피해량 (%)</span><span id="realAoeDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">발사체 피해량 (%)</span><span id="realProjectileDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">기본공격 피해량 (%)</span><span id="realBasicAttackDamagePct" class="font-bold">0%</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">공격스킬 피해량 (%)</span><span id="realSkillAttackDamagePct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">스킬 피해량 (%)</span><span id="realSkillAttackDamagePct" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">적이 받는 피해량 증가 (%)</span><span id="realDmgTakenInc" class="font-bold">0%</span></div>
                         </div>
                     </div>
@@ -506,14 +506,14 @@
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <h3 class="font-bold text-red-600 border-b pb-1 mb-2">크리티컬 및 공격스킬</h3>
                         <div class="space-y-2 text-sm">
-                            <div class="flex justify-between"><span class="text-gray-600">기본 크리티컬 확률 (%)</span><span id="realCritRate" class="font-bold">0%</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">기본 크리티컬 데미지 (%)</span><span id="realCritDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">크리티컬 확률 (%)</span><span id="realCritRate" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">크리티컬 데미지 (%)</span><span id="realCritDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">기본공격 데미지 (%)</span><span id="realBasicAttackDmg" class="font-bold">0%</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">기본공격 크리 확률 (%)</span><span id="realBasicCritRate" class="font-bold">0%</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">기본공격 크리 데미지 (%)</span><span id="realBasicCritDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본공격 크리티컬 확률 (%)</span><span id="realBasicCritRate" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본공격 크리티컬 데미지 (%)</span><span id="realBasicCritDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">스킬 데미지 (%)</span><span id="realSkillDmg" class="font-bold">0%</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">스킬 크리 확률 (%)</span><span id="realSkillCritRate" class="font-bold">0%</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">스킬 크리 데미지 (%)</span><span id="realSkillCritDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">스킬 크리티컬 확률 (%)</span><span id="realSkillCritRate" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">스킬 크리티컬 데미지 (%)</span><span id="realSkillCritDmg" class="font-bold">0%</span></div>
                         </div>
                     </div>
                 </div>
@@ -918,7 +918,7 @@
 
                         // Filter by Attack Type
                         if (attackType === '기본공격') {
-                            if (statName.includes('스킬 데미지') || statName.includes('공격스킬 피해량') || statName.includes('스킬 크리티컬')) shouldDisplayBuff = false;
+                            if (statName.includes('스킬 데미지') || statName.includes('스킬 피해량') || statName.includes('공격스킬 피해량') || statName.includes('스킬 크리티컬')) shouldDisplayBuff = false;
                         }
                         if (attackType === '스킬') {
                             if (statName.includes('기본공격 데미지') || statName.includes('기본공격 피해량') || statName.includes('기본공격 크리티컬')) shouldDisplayBuff = false;
@@ -964,7 +964,7 @@
                 else if (statName === '기본공격 데미지%') eqStats.basicAttackDmg += effectiveValue;
                 else if (statName === '스킬 데미지%') eqStats.skillDmg += effectiveValue;
                 else if (statName === '기본공격 피해량%') eqStats.basicAttackDamagePct += effectiveValue;
-                else if (statName === '공격스킬 피해량%') eqStats.skillAttackDamagePct += effectiveValue;
+                else if (statName === '스킬 피해량%' || statName === '공격스킬 피해량%') eqStats.skillAttackDamagePct += effectiveValue;
                 else if (statName === '적이 받는 피해량 증가%' || statName === '적이 받는 피해 증가%') eqStats.dmgTakenInc += effectiveValue;
                 // Newly added missing stats
                 else if (statName === '전사 데미지%') eqStats.warriorDmg += effectiveValue;
@@ -1043,6 +1043,9 @@
             const myClass = str('myClass');
 
             // 직업 데미지
+            if (document.getElementById('myClassDmgLabel')) {
+                document.getElementById('myClassDmgLabel').innerText = myClass + ' 데미지 (%)';
+            }
             let myClassDmg = 0;
             if(myClass === '전사') myClassDmg = val('warriorDmg') + val('artifact_4') + eqStats.warriorDmg;
             if(myClass === '마법사') myClassDmg = val('mageDmg') + val('artifact_5') + eqStats.mageDmg;
@@ -1057,7 +1060,7 @@
             const allDmg = val('allDmg') + eqStats.allDmg;
             const skillMultiplier = val('skillMultiplier');
             const basicAttackDamagePct = val('basicAttackDamagePct') + eqStats.basicAttackDamagePct;
-            const skillAttackDamagePct = val('skillAttackDamagePct') + eqStats.skillAttackDamagePct;
+            const skillAttackDamagePct = val('skillAttackDamagePct') + eqStats.skillAttackDamagePct + val('artifact_10');
             const dmgTakenInc = val('dmgTakenInc') + eqStats.dmgTakenInc;
 
             // 형태 피해량 (범위/발사체)
@@ -1079,7 +1082,7 @@
 
             // 공격 타입 (기본공격/스킬) 데미지
             const basicTypeDmg = val('basicAttackDmg') + eqStats.basicAttackDmg;
-            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg + ((hitType === '범위' || hitType === '발사체') ? val('artifact_10') : 0);
+            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg;
 
             let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
             let hitDmgMulti = eqStats.hitDmgMulti;
