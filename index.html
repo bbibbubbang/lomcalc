@@ -820,10 +820,14 @@
                     } else if (cooldown === -1) {
                         uptime = Math.min(1, duration / dpsT);
                     } else if (cooldown > 0 && duration > 0) {
-                        const fullCycles = Math.floor(dpsT / cooldown);
-                        const remainder = dpsT % cooldown;
-                        const activeTime = (fullCycles * duration) + Math.min(duration, remainder);
-                        uptime = activeTime / dpsT;
+                        if (duration >= cooldown) {
+                            uptime = 1;
+                        } else {
+                            const fullCycles = Math.floor(dpsT / cooldown);
+                            const remainder = dpsT % cooldown;
+                            const activeTime = (fullCycles * duration) + Math.min(duration, remainder);
+                            uptime = Math.min(1, activeTime / dpsT);
+                        }
                     }
                     if (uptime > 0) {
                         if (!appliedBuffs.includes(statName)) {
