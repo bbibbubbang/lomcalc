@@ -970,20 +970,19 @@
                                * (1 + (myClassDmg + allClassDmg) / 100) 
                                * (1 + monsterDmgBase / 100)
                                * (1 + allDmg / 100) 
-                               * hitTypeDmgMultiplier 
                                * extraAttackDamageMultiplier 
                                * dmgTakenMultiplier 
                                * 0.99;
 
             // 공격 타입 (기본공격/스킬) 데미지
             const basicTypeDmg = val('basicAttackDmg') + eqStats.basicAttackDmg;
-            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg + (attackType === '스킬' && (hitType === '범위' || hitType === '발사체') ? val('artifact_10') : 0);
+            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg + ((hitType === '범위' || hitType === '발사체') ? val('artifact_10') : 0);
 
             let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
             let hitDmgMulti = eqStats.hitDmgMulti;
 
             const basicNoCritDamage = baseDamageMultiplier * (1 + basicTypeDmg / 100) * hitMulti * hitDmgMulti;
-            const skillNoCritDamage = baseDamageMultiplier * (1 + skillTypeDmg / 100) * hitMulti * hitDmgMulti;
+            const skillNoCritDamage = baseDamageMultiplier * hitTypeDmgMultiplier * (1 + skillTypeDmg / 100) * hitMulti * hitDmgMulti;
 
             // 크리티컬 확률 & 데미지
             const baseCritRate = val('critRate') + eqStats.critRate;
