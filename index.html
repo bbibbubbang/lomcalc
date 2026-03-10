@@ -796,7 +796,6 @@
                 basicCritDmg: 0,
                 skillCritRate: 0,
                 skillCritDmg: 0,
-                autoAttackPct: 0,
                 atkSpeedBonus: 0,
                 baseHitMulti: 0,
                 hitDmgMulti: 1
@@ -870,7 +869,6 @@
                 else if (statName === '기본공격 크리티컬 데미지%') eqStats.basicCritDmg += effectiveValue;
                 else if (statName === '스킬 크리티컬 확률%') eqStats.skillCritRate += effectiveValue;
                 else if (statName === '스킬 크리티컬 데미지%') eqStats.skillCritDmg += effectiveValue;
-                else if (statName === '오토 시 공격력%') eqStats.autoAttackPct += effectiveValue;
                 else if (statName === '공격속도') eqStats.atkSpeedBonus += effectiveValue;
                 else if (statName === '기본 타수(배)') eqStats.baseHitMulti += effectiveValue;
                 else if (statName === '타수 당 피해량%') eqStats.hitDmgMulti *= (1 + effectiveValue / 100);
@@ -928,7 +926,7 @@
             eqStats.allDmg += val('artifact_12');
 
             // Apply equipment stats
-            attackPct += eqStats.attackPct + eqStats.autoAttackPct;
+            attackPct += eqStats.attackPct;
             advAttackPct += eqStats.advAttackPct;
 
             // Recalculate finalAttack with equipment
