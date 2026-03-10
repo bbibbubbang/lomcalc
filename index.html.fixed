@@ -215,7 +215,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Left Column: Stats 1 -->
             <div class="bg-white p-6 rounded-lg shadow-md">
@@ -387,7 +387,7 @@
                 <!-- Results -->
                 <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md flex-grow">
                     <h2 class="text-2xl font-bold mb-6 text-center text-yellow-400">데미지 계산 결과</h2>
-                    
+
                     <div class="space-y-4">
                         <div class="flex justify-between items-center border-b border-gray-600 pb-2">
                             <span class="text-gray-300">기본 공격력</span>
@@ -945,7 +945,7 @@
             if(myClass === '해적') myClassDmg = val('pirateDmg') + val('artifact_8') + eqStats.pirateDmg;
 
             const allClassDmg = val('allClassDmg') + eqStats.allClassDmg;
-            
+
             // 몬스터 데미지
             const monsterDmgBase = monsterType === '일반' ? val('normalMonsterDmg') + eqStats.normalMonsterDmg : val('bossMonsterDmg') + eqStats.bossMonsterDmg;
             const allDmg = val('allDmg') + eqStats.allDmg;
@@ -962,13 +962,13 @@
             const dmgTakenMultiplier = 1 + dmgTakenInc / 100;
 
             const baseDamageMultiplier = finalAttack
-                               * (skillMultiplier / 100) 
-                               * (1 + (myClassDmg + allClassDmg) / 100) 
+                               * (skillMultiplier / 100)
+                               * (1 + (myClassDmg + allClassDmg) / 100)
                                * (1 + monsterDmgBase / 100)
-                               * (1 + allDmg / 100) 
-                               * hitTypeDmgMultiplier 
-                               * extraAttackDamageMultiplier 
-                               * dmgTakenMultiplier 
+                               * (1 + allDmg / 100)
+                               * hitTypeDmgMultiplier
+                               * extraAttackDamageMultiplier
+                               * dmgTakenMultiplier
                                * 0.99;
 
             // 공격 타입 (기본공격/스킬) 데미지
@@ -1038,7 +1038,7 @@
             document.getElementById('resOriginalAttack').innerText = originalAttack.toLocaleString(undefined, {maximumFractionDigits: 1});
             document.getElementById('resNoBuffCritRate').innerText = noBuffCritRate.toFixed(1) + '%';
             document.getElementById('resBuffCritRate').innerText = buffCritRate.toFixed(1) + '%';
-            
+
             if (attackType === '기본공격') {
                 document.getElementById('resBasicDmgGroup').style.display = 'block';
                 document.getElementById('resSkillDmgGroup').style.display = 'none';
