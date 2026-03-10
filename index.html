@@ -256,8 +256,12 @@
 
                 <h2 class="text-xl font-bold mt-6 mb-4 text-purple-600 border-b pb-2">몬스터 및 기타 데미지</h2>
                 <div class="form-group">
-                    <label>일반/스킬 공격 피해량 (%)</label>
-                    <input type="number" id="attackDamagePct" class="calc-input" value="0" step="0.1">
+                    <label>기본공격 피해량 (%)</label>
+                    <input type="number" id="basicAttackDamagePct" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>공격스킬 피해량 (%)</label>
+                    <input type="number" id="skillAttackDamagePct" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
                     <label>적이 받는 피해량 증가 (%)</label>
@@ -490,7 +494,8 @@
                             <div class="flex justify-between"><span class="text-gray-600">보스 몬스터 데미지 (%)</span><span id="realBossMonsterDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">범위 피해량 (%)</span><span id="realAoeDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">발사체 피해량 (%)</span><span id="realProjectileDmg" class="font-bold">0%</span></div>
-                            <div class="flex justify-between"><span class="text-gray-600">일반/스킬 공격 피해량 (%)</span><span id="realAttackDamagePct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본공격 피해량 (%)</span><span id="realBasicAttackDamagePct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">공격스킬 피해량 (%)</span><span id="realSkillAttackDamagePct" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">적이 받는 피해량 증가 (%)</span><span id="realDmgTakenInc" class="font-bold">0%</span></div>
                         </div>
                     </div>
@@ -850,7 +855,8 @@
                 allClassDmg: 0,
                 basicAttackDmg: 0,
                 skillDmg: 0,
-                attackDamagePct: 0,
+                basicAttackDamagePct: 0,
+                skillAttackDamagePct: 0,
                 dmgTakenInc: 0,
 
                 // Add missing stats here
@@ -922,9 +928,10 @@
                 else if (statName === '범위 피해량%' || statName === '공격범위/피해량%') eqStats.aoeDmg += effectiveValue;
                 else if (statName === '발사체 피해량%') eqStats.projectileDmg += effectiveValue;
                 else if (statName === '전직업 데미지%') eqStats.allClassDmg += effectiveValue;
-                else if (statName === '기본공격 데미지%' || statName === '기본공격 피해량%') eqStats.basicAttackDmg += effectiveValue;
-                else if (statName === '스킬 데미지%' || statName === '공격스킬 피해량%') eqStats.skillDmg += effectiveValue;
-                else if (statName === '일반/스킬 공격 피해량%') eqStats.attackDamagePct += effectiveValue;
+                else if (statName === '기본공격 데미지%') eqStats.basicAttackDmg += effectiveValue;
+                else if (statName === '스킬 데미지%') eqStats.skillDmg += effectiveValue;
+                else if (statName === '기본공격 피해량%') eqStats.basicAttackDamagePct += effectiveValue;
+                else if (statName === '공격스킬 피해량%') eqStats.skillAttackDamagePct += effectiveValue;
                 else if (statName === '적이 받는 피해량 증가%' || statName === '적이 받는 피해 증가%') eqStats.dmgTakenInc += effectiveValue;
                 // Newly added missing stats
                 else if (statName === '전사 데미지%') eqStats.warriorDmg += effectiveValue;
@@ -1019,7 +1026,8 @@
             const monsterDmgBase = monsterType === '일반' ? val('normalMonsterDmg') + eqStats.normalMonsterDmg : val('bossMonsterDmg') + eqStats.bossMonsterDmg;
             const allDmg = val('allDmg') + eqStats.allDmg;
             const skillMultiplier = val('skillMultiplier');
-            const attackDamagePct = val('attackDamagePct') + eqStats.attackDamagePct;
+            const basicAttackDamagePct = val('basicAttackDamagePct') + eqStats.basicAttackDamagePct;
+            const skillAttackDamagePct = val('skillAttackDamagePct') + eqStats.skillAttackDamagePct;
             const dmgTakenInc = val('dmgTakenInc') + eqStats.dmgTakenInc;
 
             // 형태 피해량 (범위/발사체)
@@ -1027,7 +1035,8 @@
             if(hitType === '범위') hitTypeDmgMultiplier = 1 + (val('aoeDmg') + eqStats.aoeDmg) / 100;
             if(hitType === '발사체') hitTypeDmgMultiplier = 1 + (val('projectileDmg') + eqStats.projectileDmg) / 100;
 
-            const extraAttackDamageMultiplier = 1 + attackDamagePct / 100;
+            const basicExtraAttackDamageMultiplier = 1 + basicAttackDamagePct / 100;
+            const skillExtraAttackDamageMultiplier = 1 + skillAttackDamagePct / 100;
             const dmgTakenMultiplier = 1 + dmgTakenInc / 100;
 
             const baseDamageMultiplier = finalAttack
@@ -1035,7 +1044,6 @@
                                * (1 + (myClassDmg + allClassDmg) / 100) 
                                * (1 + monsterDmgBase / 100)
                                * (1 + allDmg / 100) 
-                               * extraAttackDamageMultiplier 
                                * dmgTakenMultiplier 
                                * 0.99;
 
@@ -1046,8 +1054,8 @@
             let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
             let hitDmgMulti = eqStats.hitDmgMulti;
 
-            const basicNoCritDamage = baseDamageMultiplier * (1 + basicTypeDmg / 100) * hitMulti * hitDmgMulti;
-            const skillNoCritDamage = baseDamageMultiplier * hitTypeDmgMultiplier * (1 + skillTypeDmg / 100) * hitMulti * hitDmgMulti;
+            const basicNoCritDamage = baseDamageMultiplier * basicExtraAttackDamageMultiplier * (1 + basicTypeDmg / 100) * hitMulti * hitDmgMulti;
+            const skillNoCritDamage = baseDamageMultiplier * hitTypeDmgMultiplier * skillExtraAttackDamageMultiplier * (1 + skillTypeDmg / 100) * hitMulti * hitDmgMulti;
 
             // 크리티컬 확률 & 데미지
             const baseCritRate = val('critRate') + eqStats.critRate;
@@ -1182,7 +1190,8 @@
             document.getElementById('realBossMonsterDmg').innerText = (val('bossMonsterDmg') + eqStats.bossMonsterDmg).toFixed(1) + '%';
             document.getElementById('realAoeDmg').innerText = (val('aoeDmg') + eqStats.aoeDmg).toFixed(1) + '%';
             document.getElementById('realProjectileDmg').innerText = (val('projectileDmg') + eqStats.projectileDmg).toFixed(1) + '%';
-            document.getElementById('realAttackDamagePct').innerText = attackDamagePct.toFixed(1) + '%';
+            document.getElementById('realBasicAttackDamagePct').innerText = basicAttackDamagePct.toFixed(1) + '%';
+            document.getElementById('realSkillAttackDamagePct').innerText = skillAttackDamagePct.toFixed(1) + '%';
             document.getElementById('realDmgTakenInc').innerText = dmgTakenInc.toFixed(1) + '%';
 
             document.getElementById('realCritRate').innerText = baseCritRate.toFixed(1) + '%';
