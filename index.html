@@ -1024,7 +1024,7 @@
             atkSpeed += eqStats.atkSpeedBonus;
             if(atkSpeed > 12) atkSpeed = 12;
             if(atkSpeed < 1) atkSpeed = 1;
-            const atkSpeedBonus = atkSpeed * 20;
+            const atkSpeedBonus = (atkSpeed - 1) * 20;
 
             // DPS
             const hitsPerSec = val('hitsPerSec');
