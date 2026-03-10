@@ -1186,7 +1186,7 @@
                     });
 
                     for (const [itemName, value] of Object.entries(itemSums)) {
-                        let valStr = `${value}`;
+                        let valStr = `${parseFloat(value.toFixed(1))}`;
                         if (statName.includes('%')) valStr += '%';
                         if (statName.includes('배')) valStr += '배';
                         // escape XSS:
