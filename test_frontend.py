@@ -7,6 +7,8 @@ def test_victory_pet_dps():
         page.goto('http://localhost:8000', wait_until='domcontentloaded')
 
         # set basic values
+        # Ensure the section is visible before interacting
+        page.evaluate("document.getElementById('manualStatsSection').style.display = 'block'")
         page.fill('#finalAttack', '1000')
 
         # equip Victory pet in equipPet1Type

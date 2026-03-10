@@ -7,6 +7,7 @@ def run():
         page.goto("http://localhost:8000")
 
         # Set to 기본공격, 범위, 핑크빈
+        page.evaluate("document.getElementById('manualStatsSection').style.display = 'block'")
         page.select_option("#attackType", "기본공격")
         page.select_option("#hitType", "범위")
         page.fill("#finalAttack", "1000")
@@ -16,6 +17,7 @@ def run():
         dmg1 = page.locator("#resBasicNoCritDmg").inner_text()
         print(f"기본공격, 핑크빈동상(범위스킬피해) 50%: {dmg1}")
 
+        page.evaluate("document.getElementById('manualStatsSection').style.display = 'block'")
         page.select_option("#attackType", "스킬")
         page.evaluate("calculate()")
         dmg2 = page.locator("#resSkillNoCritDmg").inner_text()

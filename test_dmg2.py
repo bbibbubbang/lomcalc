@@ -7,6 +7,7 @@ def run():
         page.goto("http://localhost:8000")
 
         # Set to 기본공격
+        page.evaluate("document.getElementById('manualStatsSection').style.display = 'block'")
         page.select_option("#attackType", "기본공격")
 
         # Base settings
@@ -17,6 +18,7 @@ def run():
         dmg1 = page.locator("#resBasicNoCritDmg").inner_text()
         print(f"기본공격, 스킬데미지50%: {dmg1}")
 
+        page.evaluate("document.getElementById('manualStatsSection').style.display = 'block'")
         page.select_option("#attackType", "스킬")
         page.evaluate("calculate()")
         dmg2 = page.locator("#resSkillNoCritDmg").inner_text()

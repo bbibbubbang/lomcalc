@@ -7,6 +7,7 @@ def run():
         page.goto("http://localhost:8000")
 
         # Set to 기본공격
+        page.evaluate("document.getElementById('manualStatsSection').style.display = 'block'")
         page.select_option("#attackType", "기본공격")
 
         # Base settings
