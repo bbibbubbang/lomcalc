@@ -975,8 +975,11 @@
             const basicTypeDmg = val('basicAttackDmg') + eqStats.basicAttackDmg;
             const skillTypeDmg = val('skillDmg') + eqStats.skillDmg + (attackType === '스킬' && (hitType === '범위' || hitType === '발사체') ? val('artifact_10') : 0);
 
-            const basicNoCritDamage = baseDamageMultiplier * (1 + basicTypeDmg / 100);
-            const skillNoCritDamage = baseDamageMultiplier * (1 + skillTypeDmg / 100);
+            let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
+            let hitDmgMulti = eqStats.hitDmgMulti;
+
+            const basicNoCritDamage = baseDamageMultiplier * (1 + basicTypeDmg / 100) * hitMulti * hitDmgMulti;
+            const skillNoCritDamage = baseDamageMultiplier * (1 + skillTypeDmg / 100) * hitMulti * hitDmgMulti;
 
             // 크리티컬 확률 & 데미지
             const baseCritRate = val('critRate') + eqStats.critRate;
@@ -1027,9 +1030,7 @@
             const dpsTime = val('dpsTime');
             const finalHitsPerSec = attackType === '스킬' ? hitsPerSec : hitsPerSec * (1 + atkSpeedBonus / 100);
 
-            let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
-            let hitDmgMulti = eqStats.hitDmgMulti;
-            const avgDPS = (avgDamage * hitDmgMulti) * (finalHitsPerSec * hitMulti);
+            const avgDPS = avgDamage * finalHitsPerSec;
 
             const totalDmg = avgDPS * dpsTime;
 
