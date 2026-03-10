@@ -367,18 +367,18 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>몬스터 종류</label>
-                        <select id="monsterType" class="calc-input bg-yellow-50">
-                            <option value="일반">일반 몬스터</option>
-                            <option value="보스">보스 몬스터</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label>공격 형태</label>
                         <select id="hitType" class="calc-input bg-yellow-50">
                             <option value="일반">일반</option>
                             <option value="범위">범위</option>
                             <option value="발사체">발사체</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>몬스터 타입</label>
+                        <select id="monsterType" class="calc-input bg-yellow-50">
+                            <option value="일반">일반 몬스터</option>
+                            <option value="보스">보스 몬스터</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -879,6 +879,12 @@
             let appliedBuffItems = {};
 
 
+            // Variables based on settings (for buff display filtering)
+            const attackType = str('attackType');
+            const monsterType = str('monsterType');
+            const hitType = str('hitType');
+
+
             // Helper for applying item stats
             const applyItemStat = (statName, statValue, isBuff, duration, cooldown, isInfDuration, itemName) => {
                 if (!statName || statValue === null || statValue === undefined) return;
@@ -902,16 +908,41 @@
                         }
                     }
                     if (uptime > 0) {
-                        if (!appliedBuffs.includes(statName)) {
-                            appliedBuffs.push(statName);
+                        let shouldDisplayBuff = true;
+
+                        // Filter by Monster Type
+                        if (monsterType === '일반' && statName.includes('보스 몬스터 데미지')) shouldDisplayBuff = false;
+                        if (monsterType === '보스' && statName.includes('일반 몬스터 데미지')) shouldDisplayBuff = false;
+
+                        // Filter by Attack Type
+                        if (attackType === '기본공격') {
+                            if (statName.includes('스킬 데미지') || statName.includes('공격스킬 피해량') || statName.includes('스킬 크리티컬')) shouldDisplayBuff = false;
                         }
-                        if (itemName) {
-                            if (!appliedBuffItems[statName]) {
-                                appliedBuffItems[statName] = [];
+                        if (attackType === '스킬') {
+                            if (statName.includes('기본공격 데미지') || statName.includes('기본공격 피해량') || statName.includes('기본공격 크리티컬')) shouldDisplayBuff = false;
+                        }
+
+                        // Filter by Hit Type
+                        if (hitType === '일반') {
+                            if (statName.includes('범위 피해량') || statName.includes('공격범위/피해량') || statName.includes('발사체 피해량')) shouldDisplayBuff = false;
+                        } else if (hitType === '범위') {
+                            if (statName.includes('발사체 피해량')) shouldDisplayBuff = false;
+                        } else if (hitType === '발사체') {
+                            if (statName.includes('범위 피해량') || statName.includes('공격범위/피해량')) shouldDisplayBuff = false;
+                        }
+
+                        if (shouldDisplayBuff) {
+                            if (!appliedBuffs.includes(statName)) {
+                                appliedBuffs.push(statName);
                             }
-                            // Calculate effective buff stat for the display
-                            const effectiveStat = statValue * uptime;
-                            appliedBuffItems[statName].push({ name: itemName, value: effectiveStat });
+                            if (itemName) {
+                                if (!appliedBuffItems[statName]) {
+                                    appliedBuffItems[statName] = [];
+                                }
+                                // Calculate effective buff stat for the display
+                                const effectiveStat = statValue * uptime;
+                                appliedBuffItems[statName].push({ name: itemName, value: effectiveStat });
+                            }
                         }
                     }
                 }
@@ -1007,9 +1038,6 @@
             finalAttack = originalAttack * (1 + attackPct / 100) * (1 + advAttackPct / 100);
 
             // Variables based on settings
-            const attackType = str('attackType');
-            const monsterType = str('monsterType');
-            const hitType = str('hitType');
             const myClass = str('myClass');
 
             // 직업 데미지
