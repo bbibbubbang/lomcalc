@@ -179,6 +179,10 @@
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="cosPocketTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                 </div>
+                <!-- 하단 접기 버튼 -->
+                <div class="md:col-span-12 mt-4 text-center border-t pb-2 pt-4">
+                    <button onclick="toggleSection('equipSection', 'equipArrow', 'equipBtnGroup')" class="text-indigo-600 font-bold hover:text-indigo-800">▲ 접기</button>
+                </div>
             </div>
         </div>
 
@@ -214,6 +218,10 @@
                     <div class="form-group flex-grow m-0"><label>핑크빈 용사 동상</label><input type="number" id="artifact_10" class="calc-input" value="0"></div>
                     <div class="form-group flex-grow m-0"><label>알트 점프</label><input type="number" id="artifact_11" class="calc-input" value="0"></div>
                     <div class="form-group flex-grow m-0"><label>차원의 서</label><input type="number" id="artifact_12" class="calc-input" value="0"></div>
+                </div>
+                <!-- 하단 접기 버튼 -->
+                <div class="md:col-span-3 mt-4 text-center border-t pb-2 pt-4">
+                    <button onclick="toggleSection('artifactSection', 'artifactArrow', 'artifactBtnGroup')" class="text-green-600 font-bold hover:text-green-800">▲ 접기</button>
                 </div>
             </div>
         </div>
@@ -400,6 +408,10 @@
                         </div>
                     </div>
                 </div>
+                <!-- 하단 접기 버튼 -->
+                <div class="mt-4 text-center border-t pb-2 pt-4">
+                    <button onclick="toggleSection('manualStatsSection', 'manualStatsArrow')" class="text-purple-600 font-bold hover:text-purple-800">▲ 접기</button>
+                </div>
             </div>
         </div>
 
@@ -516,6 +528,10 @@
                             <div class="flex justify-between"><span class="text-gray-600">스킬 크리티컬 데미지 (%)</span><span id="realSkillCritDmg" class="font-bold">0%</span></div>
                         </div>
                     </div>
+                </div>
+                <!-- 하단 접기 버튼 -->
+                <div class="mt-4 text-center border-t pb-2 pt-4">
+                    <button onclick="toggleSection('realStatsSection', 'realStatsArrow')" class="text-teal-600 font-bold hover:text-teal-800">▲ 접기</button>
                 </div>
             </div>
         </div>
@@ -880,6 +896,7 @@
             let appliedBuffs = [];
             let appliedBuffItems = {};
 
+            let twilightAdvAttackPct = 0;
 
             // Variables based on settings (for buff display filtering)
             const attackType = str('attackType');
@@ -980,6 +997,9 @@
                 else if (statName === '기본 타수(배)') eqStats.baseHitMulti += effectiveValue;
                 else if (statName === '타수 당 피해량%') eqStats.hitDmgMulti *= (1 + effectiveValue / 100);
 
+                if (itemName === '황혼' && isBuff && statName === '공격력(모험)%') {
+                    twilightAdvAttackPct += effectiveValue;
+                }
             };
 
             // Apply Equipment Stats
@@ -1039,6 +1059,10 @@
             // Recalculate finalAttack with equipment
             finalAttack = originalAttack * (1 + attackPct / 100) * (1 + advAttackPct / 100);
 
+            // finalAttack for Basic Attack (excluding Twilight buff)
+            const basicAdvAttackPct = advAttackPct - twilightAdvAttackPct;
+            const basicFinalAttack = originalAttack * (1 + attackPct / 100) * (1 + basicAdvAttackPct / 100);
+
             // Variables based on settings
             const myClass = str('myClass');
 
@@ -1072,7 +1096,15 @@
             const skillExtraAttackDamageMultiplier = 1 + skillAttackDamagePct / 100;
             const dmgTakenMultiplier = 1 + dmgTakenInc / 100;
 
-            const baseDamageMultiplier = finalAttack
+            const skillBaseDamageMultiplier = finalAttack
+                               * (skillMultiplier / 100)
+                               * (1 + (myClassDmg + allClassDmg) / 100)
+                               * (1 + monsterDmgBase / 100)
+                               * (1 + allDmg / 100)
+                               * dmgTakenMultiplier
+                               * 0.99;
+
+            const basicBaseDamageMultiplier = basicFinalAttack
                                * (skillMultiplier / 100) 
                                * (1 + (myClassDmg + allClassDmg) / 100) 
                                * (1 + monsterDmgBase / 100)
@@ -1087,8 +1119,8 @@
             let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
             let hitDmgMulti = eqStats.hitDmgMulti;
 
-            const basicNoCritDamage = baseDamageMultiplier * basicExtraAttackDamageMultiplier * (1 + basicTypeDmg / 100) * hitMulti * hitDmgMulti;
-            const skillNoCritDamage = baseDamageMultiplier * hitTypeDmgMultiplier * skillExtraAttackDamageMultiplier * (1 + skillTypeDmg / 100) * hitMulti * hitDmgMulti;
+            const basicNoCritDamage = basicBaseDamageMultiplier * basicExtraAttackDamageMultiplier * (1 + basicTypeDmg / 100) * hitMulti * hitDmgMulti;
+            const skillNoCritDamage = skillBaseDamageMultiplier * hitTypeDmgMultiplier * skillExtraAttackDamageMultiplier * (1 + skillTypeDmg / 100) * hitMulti * hitDmgMulti;
 
             // 크리티컬 확률 & 데미지
             const baseCritRate = val('critRate') + eqStats.critRate;
@@ -1163,12 +1195,6 @@
             } else {
                 buffListContainer.innerHTML = '';
             }
-            if (showBuffItemsChecked) {
-                buffListContainer.style.display = 'none';
-            } else {
-                buffListContainer.style.display = 'block';
-            }
-
             const buffItemListContainer = document.getElementById('resBuffItemList');
             if (Object.keys(appliedBuffItems).length > 0) {
                 let html = '';
@@ -1199,6 +1225,14 @@
                 buffItemListContainer.innerHTML = html;
             } else {
                 buffItemListContainer.innerHTML = '';
+            }
+
+            if (showBuffItemsChecked) {
+                buffItemListContainer.style.display = 'block';
+                buffListContainer.style.display = 'none';
+            } else {
+                buffItemListContainer.style.display = 'none';
+                buffListContainer.style.display = 'block';
             }
 
             document.getElementById('resBasicNoCritDmg').innerText = Math.floor(basicNoCritDamage).toLocaleString();
