@@ -895,6 +895,7 @@
             let conditionalCritRate = 0;
             let appliedBuffs = [];
             let appliedBuffItems = {};
+            let timeDependentBuffs = [];
 
             let twilightAdvAttackPct = 0;
 
@@ -910,12 +911,14 @@
 
                 let uptime = 1;
                 const dpsT = val('dpsTime');
+                let isTimeDependent = false;
 
                 if (isBuff) {
                     if (isInfDuration || duration === -1) {
                         uptime = 1;
                     } else if (cooldown === -1) {
                         uptime = Math.min(1, duration / dpsT);
+                        isTimeDependent = true;
                     } else if (cooldown > 0 && duration > 0) {
                         if (duration >= cooldown) {
                             uptime = 1;
@@ -924,6 +927,7 @@
                             const remainder = dpsT % cooldown;
                             const activeTime = (fullCycles * duration) + Math.min(duration, remainder);
                             uptime = Math.min(1, activeTime / dpsT);
+                            isTimeDependent = true;
                         }
                     }
                     if (uptime > 0) {
@@ -971,7 +975,14 @@
                     else if (attackType === '스킬' && statName === '스킬 크리티컬 확률%') conditionalCritRate += buffCritValue;
                 }
 
-                const effectiveValue = statValue * uptime;
+                if (isTimeDependent) {
+                    timeDependentBuffs.push({
+                        statName, statValue, duration, cooldown, itemName
+                    });
+                    return;
+                }
+
+                const effectiveValue = statValue;
 
                 if (statName === '공격력%') eqStats.attackPct += effectiveValue;
                 else if (statName === '공격력(모험)%') eqStats.advAttackPct += effectiveValue;
@@ -1084,85 +1095,228 @@
 
             const allClassDmg = val('allClassDmg') + eqStats.allClassDmg;
             
-            // 몬스터 데미지
-            const monsterDmgBase = monsterType === '일반' ? val('normalMonsterDmg') + eqStats.normalMonsterDmg : val('bossMonsterDmg') + eqStats.bossMonsterDmg;
+            const dpsTime = val('dpsTime');
+
+            let timePoints = [0, dpsTime];
+
+            const art1Time = val('artifact_1_time');
+            if (art1Time > 0 && art1Time < dpsTime && val('artifact_1') > 0) {
+                timePoints.push(art1Time);
+            }
+
+            // Gather transition times for all time-dependent buffs
+            timeDependentBuffs.forEach(buff => {
+                if (buff.cooldown === -1) {
+                    if (buff.duration < dpsTime) {
+                        timePoints.push(buff.duration);
+                    }
+                } else if (buff.cooldown > 0 && buff.duration > 0) {
+                    let t = 0;
+                    while (t < dpsTime) {
+                        timePoints.push(t);
+                        let endT = t + buff.duration;
+                        if (endT < dpsTime) timePoints.push(endT);
+                        t += buff.cooldown;
+                    }
+                }
+            });
+
+            // unique and sorted time points
+            timePoints = [...new Set(timePoints)].sort((a, b) => a - b);
+
+            let totalDmg = 0;
+            let weightedSumAvgDamage = 0;
+            let weightedSumBasicNoCritDamage = 0;
+            let weightedSumBasicCritDamage = 0;
+            let weightedSumSkillNoCritDamage = 0;
+            let weightedSumSkillCritDamage = 0;
+
+            // Helper to compute damage for a given interval
+            const computeIntervalDamage = (dt, t_mid) => {
+                let intervalEqStats = JSON.parse(JSON.stringify(eqStats));
+                let iTwilightAdvAttackPct = twilightAdvAttackPct;
+
+                // Add active buffs
+                timeDependentBuffs.forEach(buff => {
+                    let active = false;
+                    if (buff.cooldown === -1) {
+                        active = (t_mid < buff.duration);
+                    } else if (buff.cooldown > 0 && buff.duration > 0) {
+                        let cycleTime = t_mid % buff.cooldown;
+                        active = (cycleTime < buff.duration);
+                    }
+                    if (active) {
+                        const effectiveValue = buff.statValue;
+                        const statName = buff.statName;
+                        if (statName === '공격력%') intervalEqStats.attackPct += effectiveValue;
+                        else if (statName === '공격력(모험)%') intervalEqStats.advAttackPct += effectiveValue;
+                        else if (statName === '크리티컬 확률%') intervalEqStats.critRate += effectiveValue;
+                        else if (statName === '크리티컬 데미지%' || statName === '크리티컬 피해량%') intervalEqStats.critDmg += effectiveValue;
+                        else if (statName === '모든 데미지%') intervalEqStats.allDmg += effectiveValue;
+                        else if (statName === '일반 몬스터 데미지%') intervalEqStats.normalMonsterDmg += effectiveValue;
+                        else if (statName === '보스 몬스터 데미지%') intervalEqStats.bossMonsterDmg += effectiveValue;
+                        else if (statName === '범위 피해량%' || statName === '공격범위/피해량%') intervalEqStats.aoeDmg += effectiveValue;
+                        else if (statName === '발사체 피해량%') intervalEqStats.projectileDmg += effectiveValue;
+                        else if (statName === '전직업 데미지%') intervalEqStats.allClassDmg += effectiveValue;
+                        else if (statName === '기본공격 데미지%') intervalEqStats.basicAttackDmg += effectiveValue;
+                        else if (statName === '스킬 데미지%') intervalEqStats.skillDmg += effectiveValue;
+                        else if (statName === '기본공격 피해량%') intervalEqStats.basicAttackDamagePct += effectiveValue;
+                        else if (statName === '스킬 피해량%' || statName === '공격스킬 피해량%') intervalEqStats.skillAttackDamagePct += effectiveValue;
+                        else if (statName === '적이 받는 피해량 증가%' || statName === '적이 받는 피해 증가%') intervalEqStats.dmgTakenInc += effectiveValue;
+                        else if (statName === '전사 데미지%') intervalEqStats.warriorDmg += effectiveValue;
+                        else if (statName === '마법사 데미지%') intervalEqStats.mageDmg += effectiveValue;
+                        else if (statName === '궁수 데미지%') intervalEqStats.archerDmg += effectiveValue;
+                        else if (statName === '도적 데미지%') intervalEqStats.thiefDmg += effectiveValue;
+                        else if (statName === '해적 데미지%') intervalEqStats.pirateDmg += effectiveValue;
+                        else if (statName === '기본공격 크리티컬 확률%') intervalEqStats.basicCritRate += effectiveValue;
+                        else if (statName === '기본공격 크리티컬 데미지%') intervalEqStats.basicCritDmg += effectiveValue;
+                        else if (statName === '스킬 크리티컬 확률%') intervalEqStats.skillCritRate += effectiveValue;
+                        else if (statName === '스킬 크리티컬 데미지%') intervalEqStats.skillCritDmg += effectiveValue;
+                        else if (statName === '공격속도') intervalEqStats.atkSpeedBonus += effectiveValue;
+                        else if (statName === '기본 타수(배)') intervalEqStats.baseHitMulti += effectiveValue;
+                        else if (statName === '타수 당 피해량%') intervalEqStats.hitDmgMulti *= (1 + effectiveValue / 100);
+
+                        if (buff.itemName === '황혼' && statName === '공격력(모험)%') {
+                            iTwilightAdvAttackPct += effectiveValue;
+                        }
+                    }
+                });
+
+                let iAttackPct = attackPct - eqStats.attackPct + intervalEqStats.attackPct;
+                let iAdvAttackPct = advAttackPct - eqStats.advAttackPct + intervalEqStats.advAttackPct;
+                let iFinalAttack = originalAttack * (1 + iAttackPct / 100) * (1 + iAdvAttackPct / 100);
+
+                let iBasicAdvAttackPct = iAdvAttackPct - iTwilightAdvAttackPct;
+                let iBasicFinalAttack = originalAttack * (1 + iAttackPct / 100) * (1 + iBasicAdvAttackPct / 100);
+
+                let iMyClassDmg = 0;
+                if(myClass === '전사') iMyClassDmg = val('warriorDmg') + val('artifact_4') + intervalEqStats.warriorDmg;
+                if(myClass === '마법사') iMyClassDmg = val('mageDmg') + val('artifact_5') + intervalEqStats.mageDmg;
+                if(myClass === '궁수') iMyClassDmg = val('archerDmg') + val('artifact_6') + intervalEqStats.archerDmg;
+                if(myClass === '도적') iMyClassDmg = val('thiefDmg') + val('artifact_7') + intervalEqStats.thiefDmg;
+                if(myClass === '해적') iMyClassDmg = val('pirateDmg') + val('artifact_8') + intervalEqStats.pirateDmg;
+
+                const iAllClassDmg = val('allClassDmg') + intervalEqStats.allClassDmg;
+                const iMonsterDmgBase = monsterType === '일반' ? val('normalMonsterDmg') + intervalEqStats.normalMonsterDmg : val('bossMonsterDmg') + intervalEqStats.bossMonsterDmg;
+                const iAllDmg = val('allDmg') + intervalEqStats.allDmg;
+                const iSkillMultiplier = val('skillMultiplier');
+                const iBasicAttackDamagePct = val('basicAttackDamagePct') + intervalEqStats.basicAttackDamagePct;
+                const iSkillAttackDamagePct = val('skillAttackDamagePct') + intervalEqStats.skillAttackDamagePct + val('artifact_10');
+                const iDmgTakenInc = val('dmgTakenInc') + intervalEqStats.dmgTakenInc;
+
+                let iHitTypeDmgMultiplier = 1;
+                if(hitType === '범위') iHitTypeDmgMultiplier = 1 + (val('aoeDmg') + intervalEqStats.aoeDmg) / 100;
+                if(hitType === '발사체') iHitTypeDmgMultiplier = 1 + (val('projectileDmg') + intervalEqStats.projectileDmg) / 100;
+
+                const iBasicExtraAttackDamageMultiplier = 1 + iBasicAttackDamagePct / 100;
+                const iSkillExtraAttackDamageMultiplier = 1 + iSkillAttackDamagePct / 100;
+                const iDmgTakenMultiplier = 1 + iDmgTakenInc / 100;
+
+                const iSkillBaseDamageMultiplier = iFinalAttack
+                                   * (iSkillMultiplier / 100)
+                                   * (1 + (iMyClassDmg + iAllClassDmg) / 100)
+                                   * (1 + iMonsterDmgBase / 100)
+                                   * (1 + iAllDmg / 100)
+                                   * iDmgTakenMultiplier
+                                   * 0.99;
+
+                const iBasicBaseDamageMultiplier = iBasicFinalAttack
+                                   * (iSkillMultiplier / 100)
+                                   * (1 + (iMyClassDmg + iAllClassDmg) / 100)
+                                   * (1 + iMonsterDmgBase / 100)
+                                   * (1 + iAllDmg / 100)
+                                   * iDmgTakenMultiplier
+                                   * 0.99;
+
+                const iBasicTypeDmg = val('basicAttackDmg') + intervalEqStats.basicAttackDmg;
+                const iSkillTypeDmg = val('skillDmg') + intervalEqStats.skillDmg;
+
+                let iHitMulti = intervalEqStats.baseHitMulti > 0 ? intervalEqStats.baseHitMulti : 1;
+                let iHitDmgMulti = intervalEqStats.hitDmgMulti;
+
+                const iBasicNoCritDamage = iBasicBaseDamageMultiplier * iBasicExtraAttackDamageMultiplier * (1 + iBasicTypeDmg / 100) * iHitMulti * iHitDmgMulti;
+                const iSkillNoCritDamage = iSkillBaseDamageMultiplier * iHitTypeDmgMultiplier * iSkillExtraAttackDamageMultiplier * (1 + iSkillTypeDmg / 100) * iHitMulti * iHitDmgMulti;
+
+                const iBaseCritRate = val('critRate') + intervalEqStats.critRate;
+                const iBaseCritDmg = val('critDmg') + intervalEqStats.critDmg;
+
+                const iBasicCritRateAdded = val('basicCritRate') + intervalEqStats.basicCritRate;
+                const iBasicCritDmgAdded = val('basicCritDmg') + intervalEqStats.basicCritDmg;
+                const iSkillCritRateAdded = val('skillCritRate') + intervalEqStats.skillCritRate;
+                const iSkillCritDmgAdded = val('skillCritDmg') + intervalEqStats.skillCritDmg;
+
+                let iBasicTotalCritRate = iBaseCritRate + iBasicCritRateAdded;
+                if(iBasicTotalCritRate > 100) iBasicTotalCritRate = 100;
+                if(iBasicTotalCritRate < 0) iBasicTotalCritRate = 0;
+
+                let iSkillTotalCritRate = iBaseCritRate + iSkillCritRateAdded;
+                if(iSkillTotalCritRate > 100) iSkillTotalCritRate = 100;
+                if(iSkillTotalCritRate < 0) iSkillTotalCritRate = 0;
+
+                const iBasicTotalCritDmg = iBaseCritDmg + iBasicCritDmgAdded;
+                const iSkillTotalCritDmg = iBaseCritDmg + iSkillCritDmgAdded;
+
+                const iBasicCritDamage = iBasicNoCritDamage * (1 + iBasicTotalCritDmg / 100);
+                const iSkillCritDamage = iSkillNoCritDamage * (1 + iSkillTotalCritDmg / 100);
+
+                const iBasicAvgDamage = (iBasicNoCritDamage * (1 - iBasicTotalCritRate/100)) + (iBasicCritDamage * (iBasicTotalCritRate/100));
+                const iSkillAvgDamage = (iSkillNoCritDamage * (1 - iSkillTotalCritRate/100)) + (iSkillCritDamage * (iSkillTotalCritRate/100));
+
+                const iAvgDamage = attackType === '기본공격' ? iBasicAvgDamage : iSkillAvgDamage;
+
+                // 공격속도 계산
+                let atkSpeedInput = document.getElementById('atkSpeed');
+                if (parseFloat(atkSpeedInput.value) < 1) {
+                    atkSpeedInput.value = 1;
+                }
+                let iAtkSpeed = val('atkSpeed');
+                // 아티팩트_1 버프 적용
+                let artifact1Active = (t_mid < val('artifact_1_time'));
+                if (artifact1Active) iAtkSpeed += val('artifact_1');
+
+                iAtkSpeed += intervalEqStats.atkSpeedBonus;
+                if(iAtkSpeed > 12) iAtkSpeed = 12;
+                if(iAtkSpeed < 1) iAtkSpeed = 1;
+                const iAtkSpeedBonus = (iAtkSpeed - 1) * 20;
+
+                const hitsPerSec = val('hitsPerSec');
+                const finalHitsPerSec = attackType === '스킬' ? hitsPerSec : hitsPerSec * (1 + iAtkSpeedBonus / 100);
+
+                const iIntervalDPS = iAvgDamage * finalHitsPerSec;
+
+                totalDmg += iIntervalDPS * dt;
+
+                weightedSumAvgDamage += iAvgDamage * dt;
+                weightedSumBasicNoCritDamage += iBasicNoCritDamage * dt;
+                weightedSumBasicCritDamage += iBasicCritDamage * dt;
+                weightedSumSkillNoCritDamage += iSkillNoCritDamage * dt;
+                weightedSumSkillCritDamage += iSkillCritDamage * dt;
+            };
+
+            for (let i = 0; i < timePoints.length - 1; i++) {
+                const startT = timePoints[i];
+                const endT = timePoints[i+1];
+                const dt = endT - startT;
+                if (dt <= 0) continue;
+
+                const t_mid = startT + dt / 2;
+                computeIntervalDamage(dt, t_mid);
+            }
+
+            const avgDPS = totalDmg / dpsTime;
+            const avgDamage = weightedSumAvgDamage / dpsTime;
+
+            const basicNoCritDamage = weightedSumBasicNoCritDamage / dpsTime;
+            const basicCritDamage = weightedSumBasicCritDamage / dpsTime;
+            const skillNoCritDamage = weightedSumSkillNoCritDamage / dpsTime;
+            const skillCritDamage = weightedSumSkillCritDamage / dpsTime;
+
+            // Base UI stats
             const allDmg = val('allDmg') + eqStats.allDmg;
-            const skillMultiplier = val('skillMultiplier');
             const basicAttackDamagePct = val('basicAttackDamagePct') + eqStats.basicAttackDamagePct;
             const skillAttackDamagePct = val('skillAttackDamagePct') + eqStats.skillAttackDamagePct + val('artifact_10');
             const dmgTakenInc = val('dmgTakenInc') + eqStats.dmgTakenInc;
 
-            // 형태 피해량 (범위/발사체)
-            let hitTypeDmgMultiplier = 1;
-            if(hitType === '범위') hitTypeDmgMultiplier = 1 + (val('aoeDmg') + eqStats.aoeDmg) / 100;
-            if(hitType === '발사체') hitTypeDmgMultiplier = 1 + (val('projectileDmg') + eqStats.projectileDmg) / 100;
-
-            const basicExtraAttackDamageMultiplier = 1 + basicAttackDamagePct / 100;
-            const skillExtraAttackDamageMultiplier = 1 + skillAttackDamagePct / 100;
-            const dmgTakenMultiplier = 1 + dmgTakenInc / 100;
-
-            const skillBaseDamageMultiplier = finalAttack
-                               * (skillMultiplier / 100)
-                               * (1 + (myClassDmg + allClassDmg) / 100)
-                               * (1 + monsterDmgBase / 100)
-                               * (1 + allDmg / 100)
-                               * dmgTakenMultiplier
-                               * 0.99;
-
-            const basicBaseDamageMultiplier = basicFinalAttack
-                               * (skillMultiplier / 100) 
-                               * (1 + (myClassDmg + allClassDmg) / 100) 
-                               * (1 + monsterDmgBase / 100)
-                               * (1 + allDmg / 100) 
-                               * dmgTakenMultiplier 
-                               * 0.99;
-
-            // 공격 타입 (기본공격/스킬) 데미지
-            const basicTypeDmg = val('basicAttackDmg') + eqStats.basicAttackDmg;
-            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg;
-
-            let hitMulti = eqStats.baseHitMulti > 0 ? eqStats.baseHitMulti : 1;
-            let hitDmgMulti = eqStats.hitDmgMulti;
-
-            const basicNoCritDamage = basicBaseDamageMultiplier * basicExtraAttackDamageMultiplier * (1 + basicTypeDmg / 100) * hitMulti * hitDmgMulti;
-            const skillNoCritDamage = skillBaseDamageMultiplier * hitTypeDmgMultiplier * skillExtraAttackDamageMultiplier * (1 + skillTypeDmg / 100) * hitMulti * hitDmgMulti;
-
-            // 크리티컬 확률 & 데미지
-            const baseCritRate = val('critRate') + eqStats.critRate;
-            const baseCritDmg = val('critDmg') + eqStats.critDmg;
-
-            const basicCritRateAdded = val('basicCritRate') + eqStats.basicCritRate;
-            const basicCritDmgAdded = val('basicCritDmg') + eqStats.basicCritDmg;
-            const skillCritRateAdded = val('skillCritRate') + eqStats.skillCritRate;
-            const skillCritDmgAdded = val('skillCritDmg') + eqStats.skillCritDmg;
-
-            let basicTotalCritRate = baseCritRate + basicCritRateAdded;
-            if(basicTotalCritRate > 100) basicTotalCritRate = 100;
-            if(basicTotalCritRate < 0) basicTotalCritRate = 0;
-
-            let skillTotalCritRate = baseCritRate + skillCritRateAdded;
-            if(skillTotalCritRate > 100) skillTotalCritRate = 100;
-            if(skillTotalCritRate < 0) skillTotalCritRate = 0;
-
-            const basicTotalCritDmg = baseCritDmg + basicCritDmgAdded;
-            const skillTotalCritDmg = baseCritDmg + skillCritDmgAdded;
-
-            const basicCritDamage = basicNoCritDamage * (1 + basicTotalCritDmg / 100);
-            const skillCritDamage = skillNoCritDamage * (1 + skillTotalCritDmg / 100);
-
-            // 평균 데미지
-            const basicAvgDamage = (basicNoCritDamage * (1 - basicTotalCritRate/100)) + (basicCritDamage * (basicTotalCritRate/100));
-            const skillAvgDamage = (skillNoCritDamage * (1 - skillTotalCritRate/100)) + (skillCritDamage * (skillTotalCritRate/100));
-
-            const avgDamage = attackType === '기본공격' ? basicAvgDamage : skillAvgDamage;
-
-            let rawTotalCritRate = baseCritRate + (attackType === '기본공격' ? basicCritRateAdded : skillCritRateAdded);
-            let noBuffRaw = rawTotalCritRate - conditionalCritRate;
-            let noBuffCritRate = Math.min(100, Math.max(0, noBuffRaw));
-            let buffCritRate = Math.min(100 - noBuffCritRate, Math.max(0, conditionalCritRate));
-            let displayTotalCritRate = noBuffCritRate + buffCritRate;
-
-            // 공격속도
             let atkSpeedInput = document.getElementById('atkSpeed');
             if (parseFloat(atkSpeedInput.value) < 1) {
                 atkSpeedInput.value = 1;
@@ -1172,16 +1326,25 @@
             atkSpeed += eqStats.atkSpeedBonus;
             if(atkSpeed > 12) atkSpeed = 12;
             if(atkSpeed < 1) atkSpeed = 1;
-            const atkSpeedBonus = (atkSpeed - 1) * 20;
 
-            // DPS
-            const hitsPerSec = val('hitsPerSec');
-            const dpsTime = val('dpsTime');
-            const finalHitsPerSec = attackType === '스킬' ? hitsPerSec : hitsPerSec * (1 + atkSpeedBonus / 100);
+            let myClassDmg = 0;
+            if(myClass === '전사') myClassDmg = val('warriorDmg') + val('artifact_4') + eqStats.warriorDmg;
+            if(myClass === '마법사') myClassDmg = val('mageDmg') + val('artifact_5') + eqStats.mageDmg;
+            if(myClass === '궁수') myClassDmg = val('archerDmg') + val('artifact_6') + eqStats.archerDmg;
+            if(myClass === '도적') myClassDmg = val('thiefDmg') + val('artifact_7') + eqStats.thiefDmg;
+            if(myClass === '해적') myClassDmg = val('pirateDmg') + val('artifact_8') + eqStats.pirateDmg;
 
-            const avgDPS = avgDamage * finalHitsPerSec;
+            const allClassDmg = val('allClassDmg') + eqStats.allClassDmg;
 
-            const totalDmg = avgDPS * dpsTime;
+            // 크리티컬 확률 UI 출력용 연산
+            const baseCritRate = val('critRate') + eqStats.critRate;
+            const basicCritRateAdded = val('basicCritRate') + eqStats.basicCritRate;
+            const skillCritRateAdded = val('skillCritRate') + eqStats.skillCritRate;
+
+            let rawTotalCritRate = baseCritRate + (attackType === '기본공격' ? basicCritRateAdded : skillCritRateAdded);
+            let noBuffRaw = rawTotalCritRate; // UI display without time-dependent buff avg
+            let noBuffCritRate = Math.min(100, Math.max(0, noBuffRaw));
+            let buffCritRate = Math.min(100 - noBuffCritRate, Math.max(0, conditionalCritRate));
 
             // Update UI
             document.getElementById('resOriginalAttack').innerText = originalAttack.toLocaleString(undefined, {maximumFractionDigits: 1});
@@ -1268,6 +1431,25 @@
             document.getElementById('realBasicAttackDamagePct').innerText = basicAttackDamagePct.toFixed(1) + '%';
             document.getElementById('realSkillAttackDamagePct').innerText = skillAttackDamagePct.toFixed(1) + '%';
             document.getElementById('realDmgTakenInc').innerText = dmgTakenInc.toFixed(1) + '%';
+
+            // UI display for real stats needs baseline + const buffs (without time dependent average to match original logic or max)
+            // Or we just display the base without time dependent buffs here to avoid confusion.
+            const basicTypeDmg = val('basicAttackDmg') + eqStats.basicAttackDmg;
+            const skillTypeDmg = val('skillDmg') + eqStats.skillDmg;
+            const baseCritDmg = val('critDmg') + eqStats.critDmg;
+            const basicCritDmgAdded = val('basicCritDmg') + eqStats.basicCritDmg;
+            const skillCritDmgAdded = val('skillCritDmg') + eqStats.skillCritDmg;
+
+            const basicTotalCritDmg = baseCritDmg + basicCritDmgAdded;
+            const skillTotalCritDmg = baseCritDmg + skillCritDmgAdded;
+
+            let basicTotalCritRate = baseCritRate + basicCritRateAdded;
+            if(basicTotalCritRate > 100) basicTotalCritRate = 100;
+            if(basicTotalCritRate < 0) basicTotalCritRate = 0;
+
+            let skillTotalCritRate = baseCritRate + skillCritRateAdded;
+            if(skillTotalCritRate > 100) skillTotalCritRate = 100;
+            if(skillTotalCritRate < 0) skillTotalCritRate = 0;
 
             document.getElementById('realCritRate').innerText = baseCritRate.toFixed(1) + '%';
             document.getElementById('realCritDmg').innerText = baseCritDmg.toFixed(1) + '%';
