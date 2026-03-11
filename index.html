@@ -45,6 +45,11 @@
         .form-group {
             margin-bottom: 1rem;
         }
+        @media (min-width: 768px) {
+            .form-group:not(.w-24) {
+                max-width: 250px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-8 font-sans">
@@ -539,14 +544,14 @@
         <!-- Preset Section -->
         <div class="mt-6 bg-white p-6 rounded-lg shadow-md border-2 border-green-400">
             <h2 class="text-xl font-bold mb-4 text-green-600 border-b pb-2">프리셋 및 순위표</h2>
-            <div class="flex gap-4 mb-4">
+            <div class="flex gap-4 mb-4 md:max-w-sm">
                 <select id="presetFilter" class="calc-input flex-grow border rounded p-2 text-gray-700 bg-gray-50 focus:ring-green-500 focus:border-green-500">
                     <option value="전체">전체보기</option>
                     <option value="기본공격">기본공격</option>
                     <option value="스킬">스킬</option>
                 </select>
             </div>
-            <div class="flex gap-4 mb-6">
+            <div class="flex gap-4 mb-6 md:max-w-sm">
                 <input type="text" id="presetName" class="calc-input flex-grow" placeholder="프리셋 이름 (미입력시 프리셋 1, 2...)">
                 <button onclick="savePreset()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
                     저장
