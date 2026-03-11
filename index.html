@@ -1327,14 +1327,9 @@
             if(atkSpeed > 12) atkSpeed = 12;
             if(atkSpeed < 1) atkSpeed = 1;
 
-            let myClassDmg = 0;
-            if(myClass === '전사') myClassDmg = val('warriorDmg') + val('artifact_4') + eqStats.warriorDmg;
-            if(myClass === '마법사') myClassDmg = val('mageDmg') + val('artifact_5') + eqStats.mageDmg;
-            if(myClass === '궁수') myClassDmg = val('archerDmg') + val('artifact_6') + eqStats.archerDmg;
-            if(myClass === '도적') myClassDmg = val('thiefDmg') + val('artifact_7') + eqStats.thiefDmg;
-            if(myClass === '해적') myClassDmg = val('pirateDmg') + val('artifact_8') + eqStats.pirateDmg;
+            // myClassDmg is already computed above at line 1089
 
-            const allClassDmg = val('allClassDmg') + eqStats.allClassDmg;
+            // allClassDmg is already computed above at line 1096
 
             // 크리티컬 확률 UI 출력용 연산
             const baseCritRate = val('critRate') + eqStats.critRate;
