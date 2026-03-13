@@ -45,6 +45,17 @@
         .form-group {
             margin-bottom: 1rem;
         }
+        .item-desc-container {
+            display: none;
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+            white-space: pre-wrap;
+            background-color: #f9fafb;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #e5e7eb;
+        }
         @media (min-width: 768px) {
             .form-group:not(.w-24) {
                 max-width: 250px;
@@ -79,6 +90,10 @@
                         <option value="기본">기본</option>
                         <option value="메이플스토리">메이플스토리</option>
                     </select>
+                </div>
+                <div class="form-group flex items-center h-full pt-4">
+                    <input type="checkbox" id="showItemDesc" class="calc-input mr-2" onchange="toggleItemDesc()">
+                    <label for="showItemDesc" class="mb-0">아이템 설명 표시</label>
                 </div>
             </div>
         </div>
@@ -122,26 +137,32 @@
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>무기</label><select id="equipWeaponType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipWeaponGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipWeaponAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipWeaponInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipWeaponTotal" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipWeaponDesc" class="item-desc-container"></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>방어구</label><select id="equipArmorType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipArmorGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipArmorAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipArmorInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipArmorTotal" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipArmorDesc" class="item-desc-container"></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>귀걸이</label><select id="equipEarringType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipEarringGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipEarringAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipEarringInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipEarringTotal" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipEarringDesc" class="item-desc-container"></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펜던트</label><select id="equipPendantType" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipPendantGrade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipPendantAtk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPendantInc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPendantTotal" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipPendantDesc" class="item-desc-container"></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 1</label><select id="equipRing1Type" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing1Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipRing1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing1Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipRing1Total" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipRing1Desc" class="item-desc-container"></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>반지 2</label><select id="equipRing2Type" class="calc-input equip-type-select"></select></div><div class="form-group flex-grow m-0"><label>장비 등급</label><select id="equipRing2Grade" class="calc-input equip-grade-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>공격력</label><input type="number" id="equipRing2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipRing2Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipRing2Total" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipRing2Desc" class="item-desc-container"></div>
                     </div>
                 </div>
                 <!-- 2분류: 펫 -->
@@ -150,14 +171,17 @@
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 1</label><select id="equipPet1Type" class="calc-input equip-type-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>펫 1 공격력</label><input type="number" id="equipPet1Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet1Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet1Total" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipPet1Desc" class="item-desc-container"></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 2</label><select id="equipPet2Type" class="calc-input equip-type-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>펫 2 공격력</label><input type="number" id="equipPet2Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet2Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet2Total" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipPet2Desc" class="item-desc-container"></div>
                     </div>
                     <div class="flex flex-col mb-4 border-b pb-2">
                         <div class="flex gap-2"><div class="form-group flex-grow m-0"><label>펫 3</label><select id="equipPet3Type" class="calc-input equip-type-select"></select></div><div class="form-group w-24 m-0" style="display:none;"><label>펫 3 공격력</label><input type="number" id="equipPet3Atk" class="calc-input" value="0"></div><div class="form-group w-24 m-0"><label>증가량(%)</label><input type="number" id="equipPet3Inc" class="calc-input" value="0"></div></div>
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="equipPet3Total" class="font-bold text-indigo-600">0</span></div>
+                        <div id="equipPet3Desc" class="item-desc-container"></div>
                     </div>
                 </div>
                 <!-- 3분류: 치장 -->
@@ -604,6 +628,17 @@
             }
         }
 
+        function toggleItemDesc() {
+            const showItemDesc = document.getElementById('showItemDesc') && document.getElementById('showItemDesc').checked;
+            document.querySelectorAll('.item-desc-container').forEach(el => {
+                if (el.textContent.trim() !== '') {
+                    el.style.display = showItemDesc ? 'block' : 'none';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+        }
+
         function toggleSection(sectionId, arrowId, btnGroupId) {
             const section = document.getElementById(sectionId);
             const arrow = document.getElementById(arrowId);
@@ -711,6 +746,8 @@
 
                 let atkValue = 0;
 
+                let descText = '';
+
                 if (typeVal !== '없음') {
                     const selectedItem = itemDataList.find(item => item['이름'] === typeVal);
                     if (selectedItem) {
@@ -733,11 +770,63 @@
                                 atkValue = Math.round(baseAtk * (1 + percentage / 100));
                             }
                         }
+
+                        // Build description text
+                        const dList = [];
+                        if (selectedItem['부가스텟명1'] && selectedItem['부가스텟1']) {
+                            dList.push(`${selectedItem['부가스텟명1']} +${selectedItem['부가스텟1']}`);
+                        }
+                        if (selectedItem['부가스텟명2'] && selectedItem['부가스텟2']) {
+                            dList.push(`${selectedItem['부가스텟명2']} +${selectedItem['부가스텟2']}`);
+                        }
+
+                        const duration = selectedItem['버프 지속시간(초)\n// -1인 경우 무한'];
+                        const cooldown = selectedItem['버프 쿨타임(초)\n// -1:0초부터 1회만 발동'];
+
+                        let buffCondStr = '';
+                        if (duration === -1) {
+                            buffCondStr = ' (무한 지속)';
+                        } else if (duration && cooldown) {
+                            if (cooldown === -1) {
+                                buffCondStr = ` (1회 발동, 지속 ${duration}초)`;
+                            } else {
+                                buffCondStr = ` (쿨타임 ${cooldown}초, 지속 ${duration}초)`;
+                            }
+                        }
+
+                        if (selectedItem['버프스텟명1'] && selectedItem['버프스텟1']) {
+                            dList.push(`${selectedItem['버프스텟명1']} +${selectedItem['버프스텟1']}${buffCondStr}`);
+                        }
+                        if (selectedItem['버프스텟명2'] && selectedItem['버프스텟2']) {
+                            dList.push(`${selectedItem['버프스텟명2']} +${selectedItem['버프스텟2']}${buffCondStr}`);
+                        }
+
+                        if (gradeIndex >= 4 && selectedItem['레전드리3 부가스텟명'] && selectedItem['레전드리3 부가스텟']) {
+                            dList.push(`[레전드리3] ${selectedItem['레전드리3 부가스텟명']} +${selectedItem['레전드리3 부가스텟']}`);
+                        }
+                        if (gradeIndex >= 6 && selectedItem['레전드리5 버프스텟명'] && selectedItem['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'] !== -1) {
+                            const l5Stat = selectedItem['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'];
+                            dList.push(`[레전드리5] ${selectedItem['레전드리5 버프스텟명']} +${l5Stat}`);
+                        }
+                        if (gradeIndex >= 11 && selectedItem['레전드리10 부가스텟명'] && selectedItem['레전드리10 부가스텟']) {
+                            dList.push(`[레전드리10] ${selectedItem['레전드리10 부가스텟명']} +${selectedItem['레전드리10 부가스텟']}`);
+                        }
+
+                        if (dList.length > 0) {
+                            descText = dList.join('\n');
+                        }
                     }
                 }
 
                 const atkEl = document.getElementById(idPrefix + 'Atk');
                 if (atkEl) atkEl.value = atkValue;
+
+                const descEl = document.getElementById(idPrefix + 'Desc');
+                if (descEl) {
+                    descEl.textContent = descText;
+                }
+
+                toggleItemDesc();
                 calculate();
             }
         }
@@ -794,6 +883,12 @@
                     console.error("Cookie parsing error", e);
                 }
             }
+
+            // Dispatch change event to render item descriptions initially
+            document.querySelectorAll('.equip-type-select').forEach(select => {
+                select.dispatchEvent(new Event('change'));
+            });
+            toggleItemDesc();
         }
 
         // Save values to cookies
