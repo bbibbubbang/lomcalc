@@ -916,7 +916,7 @@
             let attackPct = val('attackPct');
             let advAttackPct = val('advAttackPct');
 
-            let originalAttack = finalAttack / ((1 + attackPct / 100) * (1 + advAttackPct / 100));
+            let originalAttack = finalAttack / (1 + attackPct / 100);
 
             // Calculate extra attack from inputs
             let extraAtk = 0;
