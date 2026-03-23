@@ -918,11 +918,7 @@
                         }
                         if (gradeIndex >= 6 && selectedItem['레전드리5 버프스텟명'] && selectedItem['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'] !== -1) {
                             const l5Stat = selectedItem['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'];
-                            if (l5Stat === -1 && selectedItem['레전드리5 버프스텟명'] === '해당 장비의 버프 지속시간을 무한으로 변경') {
-                                dList.push(`[레전더리5] ${selectedItem['레전드리5 버프스텟명']}`);
-                            } else {
-                                dList.push(`[레전더리5] ${selectedItem['레전드리5 버프스텟명']} +${l5Stat}${buffCondStr}`);
-                            }
+                            dList.push(`[레전더리5] ${selectedItem['레전드리5 버프스텟명']} +${l5Stat}`);
                         }
                         if (gradeIndex >= 11 && selectedItem['레전드리10 부가스텟명'] && selectedItem['레전드리10 부가스텟']) {
                             dList.push(`[레전더리10] ${selectedItem['레전드리10 부가스텟명']} +${selectedItem['레전드리10 부가스텟']}`);
@@ -1104,7 +1100,7 @@
                 skillCritRate: 0,
                 skillCritDmg: 0,
                 atkSpeedBonus: 0,
-                baseHitMulti: 1,
+                baseHitMulti: 0,
                 hitDmgMulti: 1
             };
 
@@ -1226,7 +1222,7 @@
                 else if (statName === '스킬 크리티컬 확률%') eqStats.skillCritRate += effectiveValue;
                 else if (statName === '스킬 크리티컬 데미지%') eqStats.skillCritDmg += effectiveValue;
                 else if (statName === '공격속도') eqStats.atkSpeedBonus += effectiveValue;
-                else if (statName === '기본 타수(배)') eqStats.baseHitMulti *= effectiveValue;
+                else if (statName === '기본 타수(배)') eqStats.baseHitMulti += effectiveValue;
                 else if (statName === '타수 당 피해량%') eqStats.hitDmgMulti *= (1 + effectiveValue / 100);
 
                 if (itemName === '황혼' && isBuff && statName === '공격력(모험)%') {
@@ -1389,7 +1385,7 @@
                         else if (statName === '스킬 크리티컬 확률%') intervalEqStats.skillCritRate += effectiveValue;
                         else if (statName === '스킬 크리티컬 데미지%') intervalEqStats.skillCritDmg += effectiveValue;
                         else if (statName === '공격속도') intervalEqStats.atkSpeedBonus += effectiveValue;
-                        else if (statName === '기본 타수(배)') intervalEqStats.baseHitMulti *= effectiveValue;
+                        else if (statName === '기본 타수(배)') intervalEqStats.baseHitMulti += effectiveValue;
                         else if (statName === '타수 당 피해량%') intervalEqStats.hitDmgMulti *= (1 + effectiveValue / 100);
 
                         if (buff.itemName === '황혼' && statName === '공격력(모험)%') {
@@ -1447,7 +1443,7 @@
                 const iBasicTypeDmg = val('basicAttackDmg') + intervalEqStats.basicAttackDmg;
                 const iSkillTypeDmg = val('skillDmg') + intervalEqStats.skillDmg;
 
-                let iHitMulti = intervalEqStats.baseHitMulti;
+                let iHitMulti = intervalEqStats.baseHitMulti > 0 ? intervalEqStats.baseHitMulti : 1;
                 let iHitDmgMulti = intervalEqStats.hitDmgMulti;
 
                 const iBasicNoCritDamage = iBasicBaseDamageMultiplier * iBasicExtraAttackDamageMultiplier * (1 + iBasicTypeDmg / 100) * iHitMulti * iHitDmgMulti;
