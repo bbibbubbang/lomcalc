@@ -668,8 +668,14 @@
                 if (item['부가스텟명2'] && item['부가스텟2']) baseOptions.push(`${item['부가스텟명2']} +${item['부가스텟2']}`);
 
                 let buffOptions = [];
-                if (item['버프스텟명1'] && item['버프스텟1']) buffOptions.push(`${item['버프스텟명1']} +${item['버프스텟1']}`);
-                if (item['버프스텟명2'] && item['버프스텟2']) buffOptions.push(`${item['버프스텟명2']} +${item['버프스텟2']}`);
+                if (item['버프스텟명1'] && item['버프스텟1']) {
+                    const sign = item['버프스텟명1'] === '기본 타수(배)' ? '*' : '+';
+                    buffOptions.push(`${item['버프스텟명1']} ${sign}${item['버프스텟1']}`);
+                }
+                if (item['버프스텟명2'] && item['버프스텟2']) {
+                    const sign = item['버프스텟명2'] === '기본 타수(배)' ? '*' : '+';
+                    buffOptions.push(`${item['버프스텟명2']} ${sign}${item['버프스텟2']}`);
+                }
 
                 let buffCondStr = '';
                 const duration = item['버프 지속시간(초)\n// -1인 경우 무한'];
@@ -696,7 +702,11 @@
                 }
                 const l5Stat = item['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'];
                 if (item['레전드리5 버프스텟명'] && l5Stat !== null && l5Stat !== undefined) {
-                    gradeOptions.push(`[레전더리5] ${item['레전드리5 버프스텟명']} +${l5Stat}`);
+                    if (item['레전드리5 버프스텟명'] === '해당 장비의 버프 지속시간을 무한으로 변경') {
+                        gradeOptions.push(`[레전더리5] ${item['레전드리5 버프스텟명']}`);
+                    } else {
+                        gradeOptions.push(`[레전더리5] ${item['레전드리5 버프스텟명']} +${l5Stat}`);
+                    }
                 }
                 if (item['레전드리10 부가스텟명'] && item['레전드리10 부가스텟']) {
                     gradeOptions.push(`[레전더리10] ${item['레전드리10 부가스텟명']} +${item['레전드리10 부가스텟']}`);
@@ -907,18 +917,24 @@
                         }
 
                         if (selectedItem['버프스텟명1'] && selectedItem['버프스텟1']) {
-                            dList.push(`${selectedItem['버프스텟명1']} +${selectedItem['버프스텟1']}${buffCondStr}`);
+                            const sign = selectedItem['버프스텟명1'] === '기본 타수(배)' ? '*' : '+';
+                            dList.push(`${selectedItem['버프스텟명1']} ${sign}${selectedItem['버프스텟1']}${buffCondStr}`);
                         }
                         if (selectedItem['버프스텟명2'] && selectedItem['버프스텟2']) {
-                            dList.push(`${selectedItem['버프스텟명2']} +${selectedItem['버프스텟2']}${buffCondStr}`);
+                            const sign = selectedItem['버프스텟명2'] === '기본 타수(배)' ? '*' : '+';
+                            dList.push(`${selectedItem['버프스텟명2']} ${sign}${selectedItem['버프스텟2']}${buffCondStr}`);
                         }
 
                         if (gradeIndex >= 4 && selectedItem['레전드리3 부가스텟명'] && selectedItem['레전드리3 부가스텟']) {
                             dList.push(`[레전더리3] ${selectedItem['레전드리3 부가스텟명']} +${selectedItem['레전드리3 부가스텟']}`);
                         }
-                        if (gradeIndex >= 6 && selectedItem['레전드리5 버프스텟명'] && selectedItem['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'] !== -1) {
-                            const l5Stat = selectedItem['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'];
-                            dList.push(`[레전더리5] ${selectedItem['레전드리5 버프스텟명']} +${l5Stat}`);
+                        const l5Stat = selectedItem['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'];
+                        if (gradeIndex >= 6 && selectedItem['레전드리5 버프스텟명'] && l5Stat !== null && l5Stat !== undefined) {
+                            if (selectedItem['레전드리5 버프스텟명'] === '해당 장비의 버프 지속시간을 무한으로 변경') {
+                                dList.push(`[레전더리5] ${selectedItem['레전드리5 버프스텟명']}`);
+                            } else {
+                                dList.push(`[레전더리5] ${selectedItem['레전드리5 버프스텟명']} +${l5Stat}`);
+                            }
                         }
                         if (gradeIndex >= 11 && selectedItem['레전드리10 부가스텟명'] && selectedItem['레전드리10 부가스텟']) {
                             dList.push(`[레전더리10] ${selectedItem['레전드리10 부가스텟명']} +${selectedItem['레전드리10 부가스텟']}`);
@@ -1262,7 +1278,7 @@
                 }
                 if (gradeIndex >= 6) { // 레전드리5
                     const l5Stat = item['레전드리5 버프스텟\n// 버프스텟은 기존 효과에 추가 적용\n// 버프 지속시간,쿨타임 영향 받음'];
-                    if (l5Stat !== -1) {
+                    if (l5Stat !== null && l5Stat !== undefined && l5Stat !== -1) {
                         applyItemStat(item['레전드리5 버프스텟명'], l5Stat, true, duration, cooldown, isInfDuration, item['이름']);
                     }
                 }
