@@ -1462,7 +1462,7 @@
                 let iHitMulti = intervalEqStats.baseHitMulti > 0 ? intervalEqStats.baseHitMulti : 1;
                 let iHitDmgMulti = intervalEqStats.hitDmgMulti;
 
-                const iBasicNoCritDamage = iBasicBaseDamageMultiplier * iBasicExtraAttackDamageMultiplier * (1 + iBasicTypeDmg / 100) * iHitMulti * iHitDmgMulti;
+                const iBasicNoCritDamage = iBasicBaseDamageMultiplier * iHitTypeDmgMultiplier * iBasicExtraAttackDamageMultiplier * (1 + iBasicTypeDmg / 100) * iHitMulti * iHitDmgMulti;
                 const iSkillNoCritDamage = iSkillBaseDamageMultiplier * iHitTypeDmgMultiplier * iSkillExtraAttackDamageMultiplier * (1 + iSkillTypeDmg / 100) * iHitMulti * iHitDmgMulti;
 
                 const iBaseCritRate = val('critRate') + intervalEqStats.critRate;
