@@ -319,6 +319,10 @@
                     <input type="number" id="critDmg" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
+                    <label>크리티컬 피해량 (%)</label>
+                    <input type="number" id="critDmgPct" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
                     <label>공격속도 (1~12단계)</label>
                     <input type="number" id="atkSpeed" class="calc-input" value="1" min="1" max="12">
                 </div>
@@ -579,6 +583,7 @@
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between"><span class="text-gray-600">크리티컬 확률 (%)</span><span id="realCritRate" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">크리티컬 데미지 (%)</span><span id="realCritDmg" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">크리티컬 피해량 (%)</span><span id="realCritDmgPct" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">기본공격 데미지 (%)</span><span id="realBasicAttackDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">기본공격 크리티컬 확률 (%)</span><span id="realBasicCritRate" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">기본공격 크리티컬 데미지 (%)</span><span id="realBasicCritDmg" class="font-bold">0%</span></div>
@@ -1093,6 +1098,7 @@
                 advAttackPct: 0,
                 critRate: 0,
                 critDmg: 0,
+                critDmgPct: 0,
                 allDmg: 0,
                 normalMonsterDmg: 0,
                 bossMonsterDmg: 0,
@@ -1215,7 +1221,8 @@
                 if (statName === '공격력%') eqStats.attackPct += effectiveValue;
                 else if (statName === '공격력(모험)%') eqStats.advAttackPct += effectiveValue;
                 else if (statName === '크리티컬 확률%') eqStats.critRate += effectiveValue;
-                else if (statName === '크리티컬 데미지%' || statName === '크리티컬 피해량%') eqStats.critDmg += effectiveValue;
+                else if (statName === '크리티컬 데미지%') eqStats.critDmg += effectiveValue;
+                else if (statName === '크리티컬 피해량%') eqStats.critDmgPct += effectiveValue;
                 else if (statName === '모든 데미지%') eqStats.allDmg += effectiveValue;
                 else if (statName === '일반 몬스터 데미지%') eqStats.normalMonsterDmg += effectiveValue;
                 else if (statName === '보스 몬스터 데미지%') eqStats.bossMonsterDmg += effectiveValue;
@@ -1379,7 +1386,8 @@
                         if (statName === '공격력%') intervalEqStats.attackPct += effectiveValue;
                         else if (statName === '공격력(모험)%') intervalEqStats.advAttackPct += effectiveValue;
                         else if (statName === '크리티컬 확률%') intervalEqStats.critRate += effectiveValue;
-                        else if (statName === '크리티컬 데미지%' || statName === '크리티컬 피해량%') intervalEqStats.critDmg += effectiveValue;
+                        else if (statName === '크리티컬 데미지%') intervalEqStats.critDmg += effectiveValue;
+                        else if (statName === '크리티컬 피해량%') intervalEqStats.critDmgPct += effectiveValue;
                         else if (statName === '모든 데미지%') intervalEqStats.allDmg += effectiveValue;
                         else if (statName === '일반 몬스터 데미지%') intervalEqStats.normalMonsterDmg += effectiveValue;
                         else if (statName === '보스 몬스터 데미지%') intervalEqStats.bossMonsterDmg += effectiveValue;
@@ -1484,8 +1492,10 @@
                 const iBasicTotalCritDmg = iBaseCritDmg + iBasicCritDmgAdded;
                 const iSkillTotalCritDmg = iBaseCritDmg + iSkillCritDmgAdded;
 
-                const iBasicCritDamage = iBasicNoCritDamage * (1 + iBasicTotalCritDmg / 100);
-                const iSkillCritDamage = iSkillNoCritDamage * (1 + iSkillTotalCritDmg / 100);
+                const iTotalCritDmgPct = val('critDmgPct') + intervalEqStats.critDmgPct;
+
+                const iBasicCritDamage = iBasicNoCritDamage * (1 + iBasicTotalCritDmg / 100) * (1 + iTotalCritDmgPct / 100);
+                const iSkillCritDamage = iSkillNoCritDamage * (1 + iSkillTotalCritDmg / 100) * (1 + iTotalCritDmgPct / 100);
 
                 const iBasicAvgDamage = (iBasicNoCritDamage * (1 - iBasicTotalCritRate/100)) + (iBasicCritDamage * (iBasicTotalCritRate/100));
                 const iSkillAvgDamage = (iSkillNoCritDamage * (1 - iSkillTotalCritRate/100)) + (iSkillCritDamage * (iSkillTotalCritRate/100));
@@ -1654,6 +1664,9 @@
             document.getElementById('realBasicAttackDamagePct').innerText = basicAttackDamagePct.toFixed(1) + '%';
             document.getElementById('realSkillAttackDamagePct').innerText = skillAttackDamagePct.toFixed(1) + '%';
             document.getElementById('realDmgTakenInc').innerText = dmgTakenInc.toFixed(1) + '%';
+
+            const critDmgPctValue = val('critDmgPct') + eqStats.critDmgPct;
+            document.getElementById('realCritDmgPct').innerText = critDmgPctValue.toFixed(1) + '%';
 
             // UI display for real stats needs baseline + const buffs (without time dependent average to match original logic or max)
             // Or we just display the base without time dependent buffs here to avoid confusion.
