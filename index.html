@@ -1445,16 +1445,14 @@
                                    * (1 + (iMyClassDmg + iAllClassDmg) / 100)
                                    * (1 + iMonsterDmgBase / 100)
                                    * (1 + iAllDmg / 100)
-                                   * iDmgTakenMultiplier
-                                   * 0.99;
+                                   * iDmgTakenMultiplier;
 
                 const iBasicBaseDamageMultiplier = iBasicFinalAttack
                                    * (iSkillMultiplier / 100)
                                    * (1 + (iMyClassDmg + iAllClassDmg) / 100)
                                    * (1 + iMonsterDmgBase / 100)
                                    * (1 + iAllDmg / 100)
-                                   * iDmgTakenMultiplier
-                                   * 0.99;
+                                   * iDmgTakenMultiplier;
 
                 const iBasicTypeDmg = val('basicAttackDmg') + intervalEqStats.basicAttackDmg;
                 const iSkillTypeDmg = val('skillDmg') + intervalEqStats.skillDmg;
