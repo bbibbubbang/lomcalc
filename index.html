@@ -343,6 +343,16 @@
                     <input type="number" id="atkSpeed" class="calc-input" value="1" min="1" max="12">
                 </div>
 
+                <h2 class="text-xl font-bold mt-6 mb-4 text-orange-500 border-b pb-2">백금단풍잎</h2>
+                <div class="form-group">
+                    <label>방어력 당 공격력 레벨 (0~10)</label>
+                    <input type="number" id="platinumMapleLeafDefLevel" class="calc-input" value="0" min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <label>체력 당 공격력 레벨 (0~10)</label>
+                    <input type="number" id="platinumMapleLeafHpLevel" class="calc-input" value="0" min="0" max="10">
+                </div>
+
                 <h2 class="text-xl font-bold mt-6 mb-4 text-purple-600 border-b pb-2">몬스터 및 기타 데미지</h2>
                 <div class="form-group">
                     <label>기본공격 피해량 (%)</label>
@@ -487,12 +497,8 @@
 
                     <h2 class="text-xl font-bold mt-6 mb-4 text-green-600 border-b pb-2">기타 효과 설정</h2>
                     <div class="form-group">
-                        <label>백금 단풍잎 레벨 (0~10)</label>
-                        <input type="number" id="platinumMapleLeafLevel" class="calc-input" value="0" min="0" max="10">
-                    </div>
-                    <div class="form-group">
                         <label>하드모드 패널티 (%)</label>
-                        <input type="number" id="hardModePenalty" class="calc-input" value="0" step="0.1" min="0">
+                        <input type="number" id="hardModePenalty" class="calc-input" value="100" step="0.1" min="0">
                     </div>
                         </div>
                     </div>
@@ -1360,9 +1366,16 @@
             const basicAdvAttackPct = advAttackPct - twilightAdvAttackPct;
             let basicFinalAttack = originalAttack * (1 + attackPct / 100) * (1 + basicAdvAttackPct / 100);
 
-            let mapleLeafLevelGlobal = val('platinumMapleLeafLevel');
-            if (mapleLeafLevelGlobal > 0) {
-                let globalMapleLeafBonus = mapleLeafLevelGlobal * ( Math.floor(finalDefense / 100) * 4 + Math.floor(originalHP / 1000) * 2 );
+            let mapleLeafDefLevelGlobal = val('platinumMapleLeafDefLevel');
+            let mapleLeafHpLevelGlobal = val('platinumMapleLeafHpLevel');
+            let globalMapleLeafBonus = 0;
+            if (mapleLeafDefLevelGlobal > 0) {
+                globalMapleLeafBonus += mapleLeafDefLevelGlobal * Math.floor(finalDefense / 100) * 4;
+            }
+            if (mapleLeafHpLevelGlobal > 0) {
+                globalMapleLeafBonus += mapleLeafHpLevelGlobal * Math.floor(originalHP / 1000) * 2;
+            }
+            if (globalMapleLeafBonus > 0) {
                 finalAttack += globalMapleLeafBonus;
                 basicFinalAttack += globalMapleLeafBonus;
             }
@@ -1494,9 +1507,16 @@
                 let iBasicAdvAttackPct = iAdvAttackPct - iTwilightAdvAttackPct;
                 let iBasicFinalAttack = originalAttack * (1 + iAttackPct / 100) * (1 + iBasicAdvAttackPct / 100);
 
-                let mapleLeafLevel = val('platinumMapleLeafLevel');
-                if (mapleLeafLevel > 0) {
-                    let mapleLeafBonus = mapleLeafLevel * ( Math.floor(iFinalDefense / 100) * 4 + Math.floor(originalHP / 1000) * 2 );
+                let mapleLeafDefLevel = val('platinumMapleLeafDefLevel');
+                let mapleLeafHpLevel = val('platinumMapleLeafHpLevel');
+                let mapleLeafBonus = 0;
+                if (mapleLeafDefLevel > 0) {
+                    mapleLeafBonus += mapleLeafDefLevel * Math.floor(iFinalDefense / 100) * 4;
+                }
+                if (mapleLeafHpLevel > 0) {
+                    mapleLeafBonus += mapleLeafHpLevel * Math.floor(originalHP / 1000) * 2;
+                }
+                if (mapleLeafBonus > 0) {
                     iFinalAttack += mapleLeafBonus;
                     iBasicFinalAttack += mapleLeafBonus;
                 }
