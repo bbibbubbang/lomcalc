@@ -303,12 +303,32 @@
                     <input type="number" id="finalAttack" class="calc-input" value="1000">
                 </div>
                 <div class="form-group">
+                    <label>최종 방어력</label>
+                    <input type="number" id="finalDefense" class="calc-input" value="0">
+                </div>
+                <div class="form-group">
+                    <label>최종 체력</label>
+                    <input type="number" id="finalHP" class="calc-input" value="0">
+                </div>
+                <div class="form-group">
                     <label>공격력 (%)</label>
                     <input type="number" id="attackPct" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
                     <label>공격력(모험) (%)</label>
                     <input type="number" id="advAttackPct" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>방어력 (%)</label>
+                    <input type="number" id="defensePct" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>방어력(모험) (%)</label>
+                    <input type="number" id="advDefensePct" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>오토 시 방어력 (%)</label>
+                    <input type="number" id="autoDefensePct" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
                     <label>크리티컬 확률 (%)</label>
@@ -464,6 +484,16 @@
                         <label>딜 측정 시간(초)</label>
                         <input type="number" id="dpsTime" class="calc-input" value="10" step="1" min="1">
                     </div>
+
+                    <h2 class="text-xl font-bold mt-6 mb-4 text-green-600 border-b pb-2">기타 효과 설정</h2>
+                    <div class="form-group">
+                        <label>백금 단풍잎 레벨 (0~10)</label>
+                        <input type="number" id="platinumMapleLeafLevel" class="calc-input" value="0" min="0" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label>하드모드 패널티 (%)</label>
+                        <input type="number" id="hardModePenalty" class="calc-input" value="0" step="0.1" min="0">
+                    </div>
                         </div>
                     </div>
                 </div>
@@ -550,6 +580,8 @@
                         <h3 class="font-bold text-blue-600 border-b pb-1 mb-2">기본 및 직업</h3>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between"><span class="text-gray-600">최종 공격력</span><span id="realFinalAttack" class="font-bold">0</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">최종 방어력</span><span id="realFinalDefense" class="font-bold">0</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">최종 체력</span><span id="realFinalHP" class="font-bold">0</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격력 (%)</span><span id="realAttackPct" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격력(모험) (%)</span><span id="realAdvAttackPct" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격속도</span><span id="realAtkSpeed" class="font-bold">1</span></div>
@@ -1046,6 +1078,15 @@
 
             let originalAttack = finalAttack / ((1 + attackPct / 100) * (1 + advAttackPct / 100));
 
+            let finalDefense = val('finalDefense');
+            let defensePct = val('defensePct');
+            let advDefensePct = val('advDefensePct');
+            let autoDefensePct = val('autoDefensePct');
+
+            let originalDefense = finalDefense / ((1 + defensePct / 100) * (1 + advDefensePct / 100) * (1 + autoDefensePct / 100));
+            let finalHP = val('finalHP');
+            let originalHP = finalHP;
+
             // Calculate extra attack from inputs
             let extraAtk = 0;
             const atkInputs = [
@@ -1117,7 +1158,10 @@
                 skillCritDmg: 0,
                 atkSpeedBonus: 0,
                 baseHitMulti: 0,
-                hitDmgMulti: 1
+                hitDmgMulti: 1,
+                defensePct: 0,
+                advDefensePct: 0,
+                autoDefensePct: 0
             };
 
             let conditionalCritRate = 0;
@@ -1214,6 +1258,9 @@
 
                 if (statName === '공격력%') eqStats.attackPct += effectiveValue;
                 else if (statName === '공격력(모험)%') eqStats.advAttackPct += effectiveValue;
+                else if (statName === '방어력%') eqStats.defensePct += effectiveValue;
+                else if (statName === '방어력(모험)%') eqStats.advDefensePct += effectiveValue;
+                else if (statName === '오토 시 방어력%') eqStats.autoDefensePct += effectiveValue;
                 else if (statName === '크리티컬 확률%') eqStats.critRate += effectiveValue;
                 else if (statName === '크리티컬 데미지%' || statName === '크리티컬 피해량%') eqStats.critDmg += effectiveValue;
                 else if (statName === '모든 데미지%') eqStats.allDmg += effectiveValue;
@@ -1299,13 +1346,35 @@
             // Apply equipment stats
             attackPct += eqStats.attackPct;
             advAttackPct += eqStats.advAttackPct;
+            defensePct += eqStats.defensePct;
+            advDefensePct += eqStats.advDefensePct;
+            autoDefensePct += eqStats.autoDefensePct;
 
             // Recalculate finalAttack with equipment
             finalAttack = originalAttack * (1 + attackPct / 100) * (1 + advAttackPct / 100);
 
+            // Recalculate finalDefense with equipment
+            finalDefense = originalDefense * (1 + defensePct / 100) * (1 + advDefensePct / 100) * (1 + autoDefensePct / 100);
+
             // finalAttack for Basic Attack (excluding Twilight buff)
             const basicAdvAttackPct = advAttackPct - twilightAdvAttackPct;
-            const basicFinalAttack = originalAttack * (1 + attackPct / 100) * (1 + basicAdvAttackPct / 100);
+            let basicFinalAttack = originalAttack * (1 + attackPct / 100) * (1 + basicAdvAttackPct / 100);
+
+            let mapleLeafLevelGlobal = val('platinumMapleLeafLevel');
+            if (mapleLeafLevelGlobal > 0) {
+                let globalMapleLeafBonus = mapleLeafLevelGlobal * ( Math.floor(finalDefense / 100) * 4 + Math.floor(originalHP / 1000) * 2 );
+                finalAttack += globalMapleLeafBonus;
+                basicFinalAttack += globalMapleLeafBonus;
+            }
+
+            let hardModePenalty = val('hardModePenalty');
+            if (hardModePenalty > 0) {
+                let penaltyMultiplier = hardModePenalty / 100;
+                finalAttack *= penaltyMultiplier;
+                basicFinalAttack *= penaltyMultiplier;
+                finalDefense *= penaltyMultiplier;
+                finalHP = originalHP * penaltyMultiplier;
+            }
 
             // Variables based on settings
             const myClass = str('myClass');
@@ -1378,6 +1447,9 @@
                         const statName = buff.statName;
                         if (statName === '공격력%') intervalEqStats.attackPct += effectiveValue;
                         else if (statName === '공격력(모험)%') intervalEqStats.advAttackPct += effectiveValue;
+                        else if (statName === '방어력%') intervalEqStats.defensePct += effectiveValue;
+                        else if (statName === '방어력(모험)%') intervalEqStats.advDefensePct += effectiveValue;
+                        else if (statName === '오토 시 방어력%') intervalEqStats.autoDefensePct += effectiveValue;
                         else if (statName === '크리티컬 확률%') intervalEqStats.critRate += effectiveValue;
                         else if (statName === '크리티컬 데미지%' || statName === '크리티컬 피해량%') intervalEqStats.critDmg += effectiveValue;
                         else if (statName === '모든 데미지%') intervalEqStats.allDmg += effectiveValue;
@@ -1414,8 +1486,27 @@
                 let iAdvAttackPct = advAttackPct - eqStats.advAttackPct + intervalEqStats.advAttackPct;
                 let iFinalAttack = originalAttack * (1 + iAttackPct / 100) * (1 + iAdvAttackPct / 100);
 
+                let iDefensePct = defensePct - eqStats.defensePct + intervalEqStats.defensePct;
+                let iAdvDefensePct = advDefensePct - eqStats.advDefensePct + intervalEqStats.advDefensePct;
+                let iAutoDefensePct = autoDefensePct - eqStats.autoDefensePct + intervalEqStats.autoDefensePct;
+                let iFinalDefense = originalDefense * (1 + iDefensePct / 100) * (1 + iAdvDefensePct / 100) * (1 + iAutoDefensePct / 100);
+
                 let iBasicAdvAttackPct = iAdvAttackPct - iTwilightAdvAttackPct;
                 let iBasicFinalAttack = originalAttack * (1 + iAttackPct / 100) * (1 + iBasicAdvAttackPct / 100);
+
+                let mapleLeafLevel = val('platinumMapleLeafLevel');
+                if (mapleLeafLevel > 0) {
+                    let mapleLeafBonus = mapleLeafLevel * ( Math.floor(iFinalDefense / 100) * 4 + Math.floor(originalHP / 1000) * 2 );
+                    iFinalAttack += mapleLeafBonus;
+                    iBasicFinalAttack += mapleLeafBonus;
+                }
+
+                if (hardModePenalty > 0) {
+                    let penaltyMultiplier = hardModePenalty / 100;
+                    iFinalAttack *= penaltyMultiplier;
+                    iBasicFinalAttack *= penaltyMultiplier;
+                    iFinalDefense *= penaltyMultiplier;
+                }
 
                 let iMyClassDmg = 0;
                 if(myClass === '전사') iMyClassDmg = val('warriorDmg') + val('artifact_4') + intervalEqStats.warriorDmg;
@@ -1638,6 +1729,8 @@
 
             // Update Real Stats Section
             document.getElementById('realFinalAttack').innerText = Math.floor(finalAttack).toLocaleString();
+            document.getElementById('realFinalDefense').innerText = Math.floor(finalDefense).toLocaleString();
+            document.getElementById('realFinalHP').innerText = Math.floor(finalHP).toLocaleString();
             document.getElementById('realAttackPct').innerText = attackPct.toFixed(1) + '%';
             document.getElementById('realAdvAttackPct').innerText = advAttackPct.toFixed(1) + '%';
             document.getElementById('realAtkSpeed').innerText = atkSpeed.toFixed(1);
