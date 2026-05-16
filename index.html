@@ -311,6 +311,10 @@
                     <input type="number" id="finalHP" class="calc-input" value="0">
                 </div>
                 <div class="form-group">
+                    <label>체력 (%)</label>
+                    <input type="number" id="hpPct" class="calc-input" value="0" step="0.1">
+                </div>
+                <div class="form-group">
                     <label>공격력 (%)</label>
                     <input type="number" id="attackPct" class="calc-input" value="0" step="0.1">
                 </div>
@@ -350,7 +354,23 @@
                 </div>
                 <div class="form-group">
                     <label>체력 당 공격력 레벨 (0~10)</label>
-                    <input type="number" id="platinumMapleLeafHpLevel" class="calc-input" value="0" min="0" max="10">
+                    <input type="number" id="platinumMapleLeafHpToAtkLevel" class="calc-input" value="0" min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <label>공격력 당 방어력 레벨 (0~10)</label>
+                    <input type="number" id="platinumMapleLeafAtkToDefLevel" class="calc-input" value="0" min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <label>공격력 당 체력 레벨 (0~10)</label>
+                    <input type="number" id="platinumMapleLeafAtkToHpLevel" class="calc-input" value="0" min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <label>방어력 당 체력 레벨 (0~10)</label>
+                    <input type="number" id="platinumMapleLeafDefToHpLevel" class="calc-input" value="0" min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <label>체력 당 방어력 레벨 (0~10)</label>
+                    <input type="number" id="platinumMapleLeafHpToDefLevel" class="calc-input" value="0" min="0" max="10">
                 </div>
 
                 <h2 class="text-xl font-bold mt-6 mb-4 text-purple-600 border-b pb-2">몬스터 및 기타 데미지</h2>
@@ -590,6 +610,10 @@
                             <div class="flex justify-between"><span class="text-gray-600">최종 체력</span><span id="realFinalHP" class="font-bold">0</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격력 (%)</span><span id="realAttackPct" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격력(모험) (%)</span><span id="realAdvAttackPct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">체력 (%)</span><span id="realHpPct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">방어력 (%)</span><span id="realDefensePct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">방어력(모험) (%)</span><span id="realAdvDefensePct" class="font-bold">0%</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">오토 시 방어력 (%)</span><span id="realAutoDefensePct" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격속도</span><span id="realAtkSpeed" class="font-bold">1</span></div>
                             <div class="flex justify-between"><span id="myClassDmgLabel" class="text-gray-600">선택 직업 데미지 (%)</span><span id="realMyClassDmg" class="font-bold">0%</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">전직업 데미지 (%)</span><span id="realAllClassDmg" class="font-bold">0%</span></div>
@@ -1082,16 +1106,17 @@
             let attackPct = val('attackPct');
             let advAttackPct = val('advAttackPct');
 
-            let originalAttack = finalAttack / ((1 + attackPct / 100) * (1 + advAttackPct / 100));
+            let originalAttack = finalAttack / (1 + attackPct / 100);
 
             let finalDefense = val('finalDefense');
             let defensePct = val('defensePct');
             let advDefensePct = val('advDefensePct');
             let autoDefensePct = val('autoDefensePct');
 
-            let originalDefense = finalDefense / ((1 + defensePct / 100) * (1 + advDefensePct / 100) * (1 + autoDefensePct / 100));
+            let originalDefense = finalDefense / (1 + defensePct / 100);
             let finalHP = val('finalHP');
-            let originalHP = finalHP;
+            let hpPct = val('hpPct') || 0;
+            let originalHP = finalHP / (1 + hpPct / 100);
 
             // Calculate extra attack from inputs
             let extraAtk = 0;
@@ -1360,24 +1385,43 @@
             finalAttack = originalAttack * (1 + attackPct / 100) * (1 + advAttackPct / 100);
 
             // Recalculate finalDefense with equipment
-            finalDefense = originalDefense * (1 + defensePct / 100) * (1 + advDefensePct / 100) * (1 + autoDefensePct / 100);
+            finalDefense = originalDefense * (1 + defensePct / 100);
+            finalDefense = finalDefense * (1 + advDefensePct / 100);
+            finalDefense = finalDefense * (1 + autoDefensePct / 100);
 
             // finalAttack for Basic Attack (excluding Twilight buff)
             const basicAdvAttackPct = advAttackPct - twilightAdvAttackPct;
-            let basicFinalAttack = originalAttack * (1 + attackPct / 100) * (1 + basicAdvAttackPct / 100);
+            let basicFinalAttack = originalAttack * (1 + attackPct / 100);
+            basicFinalAttack = basicFinalAttack * (1 + basicAdvAttackPct / 100);
 
-            let mapleLeafDefLevelGlobal = val('platinumMapleLeafDefLevel');
-            let mapleLeafHpLevelGlobal = val('platinumMapleLeafHpLevel');
-            let globalMapleLeafBonus = 0;
-            if (mapleLeafDefLevelGlobal > 0) {
-                globalMapleLeafBonus += mapleLeafDefLevelGlobal * Math.floor(finalDefense / 100) * 4;
+            let mapleLeafDefToAtkLevelGlobal = val('platinumMapleLeafDefLevel') || 0;
+            let mapleLeafAtkToDefLevelGlobal = val('platinumMapleLeafAtkToDefLevel') || 0;
+            let mapleLeafAtkToHpLevelGlobal = val('platinumMapleLeafAtkToHpLevel') || 0;
+            let mapleLeafHpToAtkLevelGlobal = val('platinumMapleLeafHpToAtkLevel') || 0;
+            let mapleLeafDefToHpLevelGlobal = val('platinumMapleLeafDefToHpLevel') || 0;
+            let mapleLeafHpToDefLevelGlobal = val('platinumMapleLeafHpToDefLevel') || 0;
+
+            let globalMapleLeafAtkBonus = 0;
+            let globalMapleLeafDefBonus = 0;
+            let globalMapleLeafHpBonus = 0;
+
+            if (mapleLeafDefToAtkLevelGlobal > 0) {
+                globalMapleLeafAtkBonus += mapleLeafDefToAtkLevelGlobal * Math.floor(finalDefense / 100) * 4;
             }
-            if (mapleLeafHpLevelGlobal > 0) {
-                globalMapleLeafBonus += mapleLeafHpLevelGlobal * Math.floor(originalHP / 1000) * 2;
+            if (mapleLeafHpToAtkLevelGlobal > 0) {
+                globalMapleLeafAtkBonus += mapleLeafHpToAtkLevelGlobal * Math.floor(originalHP / 1000) * 2;
             }
-            if (globalMapleLeafBonus > 0) {
-                finalAttack += globalMapleLeafBonus;
-                basicFinalAttack += globalMapleLeafBonus;
+            if (mapleLeafAtkToDefLevelGlobal > 0) {
+                globalMapleLeafDefBonus += mapleLeafAtkToDefLevelGlobal * Math.floor(finalAttack / 100) * 1;
+            }
+            if (mapleLeafAtkToHpLevelGlobal > 0) {
+                globalMapleLeafHpBonus += mapleLeafAtkToHpLevelGlobal * Math.floor(finalAttack / 100) * 20;
+            }
+            if (mapleLeafDefToHpLevelGlobal > 0) {
+                globalMapleLeafHpBonus += mapleLeafDefToHpLevelGlobal * Math.floor(finalDefense / 100) * 40;
+            }
+            if (mapleLeafHpToDefLevelGlobal > 0) {
+                globalMapleLeafDefBonus += mapleLeafHpToDefLevelGlobal * Math.floor(originalHP / 1000) * 1;
             }
 
             let hardModePenalty = val('hardModePenalty');
@@ -1386,7 +1430,18 @@
                 finalAttack *= penaltyMultiplier;
                 basicFinalAttack *= penaltyMultiplier;
                 finalDefense *= penaltyMultiplier;
-                finalHP = originalHP * penaltyMultiplier;
+                finalHP *= penaltyMultiplier;
+            }
+
+            if (globalMapleLeafAtkBonus > 0) {
+                finalAttack += globalMapleLeafAtkBonus;
+                basicFinalAttack += globalMapleLeafAtkBonus;
+            }
+            if (globalMapleLeafDefBonus > 0) {
+                finalDefense += globalMapleLeafDefBonus;
+            }
+            if (globalMapleLeafHpBonus > 0) {
+                finalHP += globalMapleLeafHpBonus;
             }
 
             // Variables based on settings
@@ -1502,23 +1557,42 @@
                 let iDefensePct = defensePct - eqStats.defensePct + intervalEqStats.defensePct;
                 let iAdvDefensePct = advDefensePct - eqStats.advDefensePct + intervalEqStats.advDefensePct;
                 let iAutoDefensePct = autoDefensePct - eqStats.autoDefensePct + intervalEqStats.autoDefensePct;
-                let iFinalDefense = originalDefense * (1 + iDefensePct / 100) * (1 + iAdvDefensePct / 100) * (1 + iAutoDefensePct / 100);
+                let iFinalDefense = originalDefense * (1 + iDefensePct / 100);
+                iFinalDefense = iFinalDefense * (1 + iAdvDefensePct / 100);
+                iFinalDefense = iFinalDefense * (1 + iAutoDefensePct / 100);
 
                 let iBasicAdvAttackPct = iAdvAttackPct - iTwilightAdvAttackPct;
-                let iBasicFinalAttack = originalAttack * (1 + iAttackPct / 100) * (1 + iBasicAdvAttackPct / 100);
+                let iBasicFinalAttack = originalAttack * (1 + iAttackPct / 100);
+                iBasicFinalAttack = iBasicFinalAttack * (1 + iBasicAdvAttackPct / 100);
 
-                let mapleLeafDefLevel = val('platinumMapleLeafDefLevel');
-                let mapleLeafHpLevel = val('platinumMapleLeafHpLevel');
-                let mapleLeafBonus = 0;
-                if (mapleLeafDefLevel > 0) {
-                    mapleLeafBonus += mapleLeafDefLevel * Math.floor(iFinalDefense / 100) * 4;
+                let mapleLeafDefToAtkLevel = val('platinumMapleLeafDefLevel') || 0;
+                let mapleLeafAtkToDefLevel = val('platinumMapleLeafAtkToDefLevel') || 0;
+                let mapleLeafAtkToHpLevel = val('platinumMapleLeafAtkToHpLevel') || 0;
+                let mapleLeafHpToAtkLevel = val('platinumMapleLeafHpToAtkLevel') || 0;
+                let mapleLeafDefToHpLevel = val('platinumMapleLeafDefToHpLevel') || 0;
+                let mapleLeafHpToDefLevel = val('platinumMapleLeafHpToDefLevel') || 0;
+
+                let mapleLeafAtkBonus = 0;
+                let mapleLeafDefBonus = 0;
+                let mapleLeafHpBonus = 0;
+
+                if (mapleLeafDefToAtkLevel > 0) {
+                    mapleLeafAtkBonus += mapleLeafDefToAtkLevel * Math.floor(iFinalDefense / 100) * 4;
                 }
-                if (mapleLeafHpLevel > 0) {
-                    mapleLeafBonus += mapleLeafHpLevel * Math.floor(originalHP / 1000) * 2;
+                if (mapleLeafHpToAtkLevel > 0) {
+                    mapleLeafAtkBonus += mapleLeafHpToAtkLevel * Math.floor(originalHP / 1000) * 2;
                 }
-                if (mapleLeafBonus > 0) {
-                    iFinalAttack += mapleLeafBonus;
-                    iBasicFinalAttack += mapleLeafBonus;
+                if (mapleLeafAtkToDefLevel > 0) {
+                    mapleLeafDefBonus += mapleLeafAtkToDefLevel * Math.floor(iFinalAttack / 100) * 1;
+                }
+                if (mapleLeafAtkToHpLevel > 0) {
+                    mapleLeafHpBonus += mapleLeafAtkToHpLevel * Math.floor(iFinalAttack / 100) * 20;
+                }
+                if (mapleLeafDefToHpLevel > 0) {
+                    mapleLeafHpBonus += mapleLeafDefToHpLevel * Math.floor(iFinalDefense / 100) * 40;
+                }
+                if (mapleLeafHpToDefLevel > 0) {
+                    mapleLeafDefBonus += mapleLeafHpToDefLevel * Math.floor(originalHP / 1000) * 1;
                 }
 
                 if (hardModePenalty > 0) {
@@ -1527,6 +1601,16 @@
                     iBasicFinalAttack *= penaltyMultiplier;
                     iFinalDefense *= penaltyMultiplier;
                 }
+
+                if (mapleLeafAtkBonus > 0) {
+                    iFinalAttack += mapleLeafAtkBonus;
+                    iBasicFinalAttack += mapleLeafAtkBonus;
+                }
+                if (mapleLeafDefBonus > 0) {
+                    iFinalDefense += mapleLeafDefBonus;
+                }
+                // HP is not interval dependent in calculations right now, but for completeness or if it were:
+                // iFinalHP += mapleLeafHpBonus;
 
                 let iMyClassDmg = 0;
                 if(myClass === '전사') iMyClassDmg = val('warriorDmg') + val('artifact_4') + intervalEqStats.warriorDmg;
@@ -1753,6 +1837,10 @@
             document.getElementById('realFinalHP').innerText = Math.floor(finalHP).toLocaleString();
             document.getElementById('realAttackPct').innerText = attackPct.toFixed(1) + '%';
             document.getElementById('realAdvAttackPct').innerText = advAttackPct.toFixed(1) + '%';
+            document.getElementById('realHpPct').innerText = hpPct.toFixed(1) + '%';
+            document.getElementById('realDefensePct').innerText = defensePct.toFixed(1) + '%';
+            document.getElementById('realAdvDefensePct').innerText = advDefensePct.toFixed(1) + '%';
+            document.getElementById('realAutoDefensePct').innerText = autoDefensePct.toFixed(1) + '%';
             document.getElementById('realAtkSpeed').innerText = atkSpeed.toFixed(1);
             document.getElementById('realMyClassDmg').innerText = myClassDmg.toFixed(1) + '%';
             document.getElementById('realAllClassDmg').innerText = allClassDmg.toFixed(1) + '%';
