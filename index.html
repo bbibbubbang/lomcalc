@@ -1409,7 +1409,7 @@
                 globalMapleLeafAtkBonus += mapleLeafDefToAtkLevelGlobal * Math.floor(finalDefense / 100) * 4;
             }
             if (mapleLeafHpToAtkLevelGlobal > 0) {
-                globalMapleLeafAtkBonus += mapleLeafHpToAtkLevelGlobal * Math.floor(originalHP / 1000) * 2;
+                globalMapleLeafAtkBonus += mapleLeafHpToAtkLevelGlobal * Math.floor(finalHP / 1000) * 2;
             }
             if (mapleLeafAtkToDefLevelGlobal > 0) {
                 globalMapleLeafDefBonus += mapleLeafAtkToDefLevelGlobal * Math.floor(finalAttack / 100) * 1;
@@ -1421,7 +1421,7 @@
                 globalMapleLeafHpBonus += mapleLeafDefToHpLevelGlobal * Math.floor(finalDefense / 100) * 40;
             }
             if (mapleLeafHpToDefLevelGlobal > 0) {
-                globalMapleLeafDefBonus += mapleLeafHpToDefLevelGlobal * Math.floor(originalHP / 1000) * 1;
+                globalMapleLeafDefBonus += mapleLeafHpToDefLevelGlobal * Math.floor(finalHP / 1000) * 1;
             }
 
             if (globalMapleLeafAtkBonus > 0) {
@@ -1576,11 +1576,13 @@
                 let mapleLeafDefBonus = 0;
                 let mapleLeafHpBonus = 0;
 
+                let iFinalHP = originalHP * (1 + hpPct / 100);
+
                 if (mapleLeafDefToAtkLevel > 0) {
                     mapleLeafAtkBonus += mapleLeafDefToAtkLevel * Math.floor(iFinalDefense / 100) * 4;
                 }
                 if (mapleLeafHpToAtkLevel > 0) {
-                    mapleLeafAtkBonus += mapleLeafHpToAtkLevel * Math.floor(originalHP / 1000) * 2;
+                    mapleLeafAtkBonus += mapleLeafHpToAtkLevel * Math.floor(iFinalHP / 1000) * 2;
                 }
                 if (mapleLeafAtkToDefLevel > 0) {
                     mapleLeafDefBonus += mapleLeafAtkToDefLevel * Math.floor(iFinalAttack / 100) * 1;
@@ -1592,7 +1594,7 @@
                     mapleLeafHpBonus += mapleLeafDefToHpLevel * Math.floor(iFinalDefense / 100) * 40;
                 }
                 if (mapleLeafHpToDefLevel > 0) {
-                    mapleLeafDefBonus += mapleLeafHpToDefLevel * Math.floor(originalHP / 1000) * 1;
+                    mapleLeafDefBonus += mapleLeafHpToDefLevel * Math.floor(iFinalHP / 1000) * 1;
                 }
 
                 if (mapleLeafAtkBonus > 0) {
