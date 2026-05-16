@@ -1424,15 +1424,6 @@
                 globalMapleLeafDefBonus += mapleLeafHpToDefLevelGlobal * Math.floor(originalHP / 1000) * 1;
             }
 
-            let hardModePenalty = val('hardModePenalty');
-            if (hardModePenalty > 0) {
-                let penaltyMultiplier = hardModePenalty / 100;
-                finalAttack *= penaltyMultiplier;
-                basicFinalAttack *= penaltyMultiplier;
-                finalDefense *= penaltyMultiplier;
-                finalHP *= penaltyMultiplier;
-            }
-
             if (globalMapleLeafAtkBonus > 0) {
                 finalAttack += globalMapleLeafAtkBonus;
                 basicFinalAttack += globalMapleLeafAtkBonus;
@@ -1442,6 +1433,15 @@
             }
             if (globalMapleLeafHpBonus > 0) {
                 finalHP += globalMapleLeafHpBonus;
+            }
+
+            let hardModePenalty = val('hardModePenalty');
+            if (hardModePenalty > 0) {
+                let penaltyMultiplier = hardModePenalty / 100;
+                finalAttack *= penaltyMultiplier;
+                basicFinalAttack *= penaltyMultiplier;
+                finalDefense *= penaltyMultiplier;
+                finalHP *= penaltyMultiplier;
             }
 
             // Variables based on settings
@@ -1595,13 +1595,6 @@
                     mapleLeafDefBonus += mapleLeafHpToDefLevel * Math.floor(originalHP / 1000) * 1;
                 }
 
-                if (hardModePenalty > 0) {
-                    let penaltyMultiplier = hardModePenalty / 100;
-                    iFinalAttack *= penaltyMultiplier;
-                    iBasicFinalAttack *= penaltyMultiplier;
-                    iFinalDefense *= penaltyMultiplier;
-                }
-
                 if (mapleLeafAtkBonus > 0) {
                     iFinalAttack += mapleLeafAtkBonus;
                     iBasicFinalAttack += mapleLeafAtkBonus;
@@ -1611,6 +1604,13 @@
                 }
                 // HP is not interval dependent in calculations right now, but for completeness or if it were:
                 // iFinalHP += mapleLeafHpBonus;
+
+                if (hardModePenalty > 0) {
+                    let penaltyMultiplier = hardModePenalty / 100;
+                    iFinalAttack *= penaltyMultiplier;
+                    iBasicFinalAttack *= penaltyMultiplier;
+                    iFinalDefense *= penaltyMultiplier;
+                }
 
                 let iMyClassDmg = 0;
                 if(myClass === '전사') iMyClassDmg = val('warriorDmg') + val('artifact_4') + intervalEqStats.warriorDmg;
