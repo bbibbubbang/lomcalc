@@ -1810,28 +1810,28 @@
                 const iSkillExtraAttackDamageMultiplier = 1 + iSkillAttackDamagePct / 100;
                 const iDmgTakenMultiplier = 1 + iDmgTakenInc / 100;
 
+                const iBasicTypeDmg = val('basicAttackDmg') + intervalEqStats.basicAttackDmg;
+                const iSkillTypeDmg = val('skillDmg') + intervalEqStats.skillDmg;
+
                 const iSkillBaseDamageMultiplier = iFinalAttack
                                    * (iSkillMultiplier / 100)
                                    * (1 + (iMyClassDmg + iAllClassDmg) / 100)
                                    * (1 + iMonsterDmgBase / 100)
-                                   * (1 + iAllDmg / 100)
+                                   * (1 + (iAllDmg + iSkillTypeDmg) / 100)
                                    * iDmgTakenMultiplier;
 
                 const iBasicBaseDamageMultiplier = iBasicFinalAttack
                                    * (iSkillMultiplier / 100)
                                    * (1 + (iMyClassDmg + iAllClassDmg) / 100)
                                    * (1 + iMonsterDmgBase / 100)
-                                   * (1 + iAllDmg / 100)
+                                   * (1 + (iAllDmg + iBasicTypeDmg) / 100)
                                    * iDmgTakenMultiplier;
-
-                const iBasicTypeDmg = val('basicAttackDmg') + intervalEqStats.basicAttackDmg;
-                const iSkillTypeDmg = val('skillDmg') + intervalEqStats.skillDmg;
 
                 let iHitMulti = intervalEqStats.baseHitMulti > 0 ? intervalEqStats.baseHitMulti : 1;
                 let iHitDmgMulti = intervalEqStats.hitDmgMulti;
 
-                const iBasicNoCritDamage = iBasicBaseDamageMultiplier * iHitTypeDmgMultiplier * iBasicExtraAttackDamageMultiplier * (1 + iBasicTypeDmg / 100) * iHitMulti * iHitDmgMulti;
-                const iSkillNoCritDamage = iSkillBaseDamageMultiplier * iHitTypeDmgMultiplier * iSkillExtraAttackDamageMultiplier * (1 + iSkillTypeDmg / 100) * iHitMulti * iHitDmgMulti;
+                const iBasicNoCritDamage = iBasicBaseDamageMultiplier * iHitTypeDmgMultiplier * iBasicExtraAttackDamageMultiplier * iHitMulti * iHitDmgMulti;
+                const iSkillNoCritDamage = iSkillBaseDamageMultiplier * iHitTypeDmgMultiplier * iSkillExtraAttackDamageMultiplier * iHitMulti * iHitDmgMulti;
 
                 const iBaseCritRate = val('critRate') + intervalEqStats.critRate;
                 const iBaseCritDmg = val('critDmg') + intervalEqStats.critDmg;
