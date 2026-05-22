@@ -660,7 +660,7 @@
 
                     <!-- Column 2: Additional Stats -->
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h3 class="font-bold text-blue-600 border-b pb-1 mb-2">추가 능력치</h3>
+                        <h3 class="font-bold text-blue-600 border-b pb-1 mb-2">최종 능력치</h3>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between"><span class="text-gray-600">최종 공격력</span><span id="realFinalAttack" class="font-bold">0</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격력 (%)</span><span id="realAttackPct" class="font-bold">0%</span></div>
@@ -1314,12 +1314,10 @@
             let Cha = initMapleLeafAtkToHpLevel * 20 / 100;
             let Chd = initMapleLeafDefToHpLevel * 40 / 100;
 
-            const baseLeafStats = removePlatinumLeafBonus(finalAttack, finalDefense, finalHP, Cad, Cah, Cda, Cdh, Cha, Chd);
-
-            // 역산: 순수 기본 능력치는 단풍잎을 뺀 후 마을 %를 나눈 값
-            let originalAttack = Math.max(0, baseLeafStats.baseA) / (1 + townAttackPct / 100);
-            let originalDefense = Math.max(0, baseLeafStats.baseD) / (1 + townDefensePct / 100);
-            let originalHP = Math.max(0, baseLeafStats.baseH) / (1 + townHpPct / 100);
+            // 역산: 순수 기본 능력치는 입력된 최종값을 마을 %로 나눈 값
+            let originalAttack = Math.max(0, finalAttack) / (1 + townAttackPct / 100);
+            let originalDefense = Math.max(0, finalDefense) / (1 + townDefensePct / 100);
+            let originalHP = Math.max(0, finalHP) / (1 + townHpPct / 100);
 
             // Calculate extra attack from inputs
             let extraAtk = 0;
@@ -1602,11 +1600,11 @@
             const basicBuffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + basicAdvAttackPct / 100) * (1 + autoAttackPct / 100);
 
             // 2단계: 백금 단풍잎 보너스를 '동시에' 계산하여 최종 합산 (순차적 갱신 절대 금지)
-            finalAttack = buffedA + Math.floor(buffedD / 100) * (Cad * 100) + Math.floor(buffedH / 1000) * (Cah * 1000);
-            finalDefense = buffedD + Math.floor(buffedA / 100) * (Cda * 100) + Math.floor(buffedH / 1000) * (Cdh * 1000);
-            finalHP = buffedH + Math.floor(buffedA / 100) * (Cha * 100) + Math.floor(buffedD / 100) * (Chd * 100);
+            finalAttack = buffedA + (buffedD * Cad) + (buffedH * Cah);
+            finalDefense = buffedD + (buffedA * Cda) + (buffedH * Cdh);
+            finalHP = buffedH + (buffedA * Cha) + (buffedD * Chd);
 
-            let basicFinalAttack = basicBuffedA + Math.floor(buffedD / 100) * (Cad * 100) + Math.floor(buffedH / 1000) * (Cah * 1000);
+            let basicFinalAttack = basicBuffedA + (buffedD * Cad) + (buffedH * Cah);
 
             let hardModePenalty = val('hardModePenalty');
             if (hardModePenalty > 0) {
@@ -1746,10 +1744,10 @@
                 const iBasicBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + iBasicAdvAttackPct / 100) * (1 + iAutoAttackPct / 100);
 
                 // 2단계: 백금 단풍잎 보너스를 '동시에' 계산하여 최종 합산 (순차적 갱신 절대 금지)
-                let iFinalAttack = iBuffedA + Math.floor(iBuffedD / 100) * (Cad * 100) + Math.floor(iBuffedH / 1000) * (Cah * 1000);
-                let iFinalDefense = iBuffedD + Math.floor(iBuffedA / 100) * (Cda * 100) + Math.floor(iBuffedH / 1000) * (Cdh * 1000);
-                let iFinalHP = iBuffedH + Math.floor(iBuffedA / 100) * (Cha * 100) + Math.floor(iBuffedD / 100) * (Chd * 100);
-                let iBasicFinalAttack = iBasicBuffedA + Math.floor(iBuffedD / 100) * (Cad * 100) + Math.floor(iBuffedH / 1000) * (Cah * 1000);
+                let iFinalAttack = iBuffedA + (iBuffedD * Cad) + (iBuffedH * Cah);
+                let iFinalDefense = iBuffedD + (iBuffedA * Cda) + (iBuffedH * Cdh);
+                let iFinalHP = iBuffedH + (iBuffedA * Cha) + (iBuffedD * Chd);
+                let iBasicFinalAttack = iBasicBuffedA + (iBuffedD * Cad) + (iBuffedH * Cah);
 
                 if (hardModePenalty > 0) {
                     let penaltyMultiplier = hardModePenalty / 100;
