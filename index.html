@@ -1248,16 +1248,16 @@
                 initMapleLeafAtkBonus += initMapleLeafHpToAtkLevel * Math.floor(finalHP / 1000) * 2;
             }
             if (initMapleLeafAtkToDefLevel > 0) {
-                initMapleLeafDefBonus += initMapleLeafAtkToDefLevel * Math.floor(finalAttack / 100) * 12;
+                initMapleLeafDefBonus += initMapleLeafAtkToDefLevel * Math.floor(finalAttack / 100) * 1;
             }
             if (initMapleLeafHpToDefLevel > 0) {
-                initMapleLeafDefBonus += initMapleLeafHpToDefLevel * Math.floor(finalHP / 1000) * 8;
+                initMapleLeafDefBonus += initMapleLeafHpToDefLevel * Math.floor(finalHP / 1000) * 1;
             }
             if (initMapleLeafAtkToHpLevel > 0) {
-                initMapleLeafHpBonus += initMapleLeafAtkToHpLevel * Math.floor(finalAttack / 100) * 50;
+                initMapleLeafHpBonus += initMapleLeafAtkToHpLevel * Math.floor(finalAttack / 100) * 20;
             }
             if (initMapleLeafDefToHpLevel > 0) {
-                initMapleLeafHpBonus += initMapleLeafDefToHpLevel * Math.floor(finalDefense / 100) * 15;
+                initMapleLeafHpBonus += initMapleLeafDefToHpLevel * Math.floor(finalDefense / 100) * 40;
             }
 
             // 역산: 순수 기본 능력치는 단풍잎을 뺀 후 마을 %를 나눈 값
@@ -2007,9 +2007,13 @@
             document.getElementById('resTotalDmg').innerText = Math.floor(totalDmg).toLocaleString();
 
             // Update Real Stats Section
-            document.getElementById('realOriginalAttack').innerText = Math.floor(originalAttack).toLocaleString();
-            document.getElementById('realOriginalDefense').innerText = Math.floor(originalDefense).toLocaleString();
-            document.getElementById('realOriginalHP').innerText = Math.floor(originalHP).toLocaleString();
+            let pureOriginalAttack = Math.max(0, val('finalAttack') - initMapleLeafAtkBonus) / (1 + val('townAttackPct') / 100);
+            let pureOriginalDefense = Math.max(0, val('finalDefense') - initMapleLeafDefBonus) / (1 + val('townDefensePct') / 100);
+            let pureOriginalHP = Math.max(0, val('finalHP') - initMapleLeafHpBonus) / (1 + val('townHpPct') / 100);
+
+            document.getElementById('realOriginalAttack').innerText = Math.floor(pureOriginalAttack).toLocaleString();
+            document.getElementById('realOriginalDefense').innerText = Math.floor(pureOriginalDefense).toLocaleString();
+            document.getElementById('realOriginalHP').innerText = Math.floor(pureOriginalHP).toLocaleString();
             document.getElementById('realFinalAttack').innerText = Math.floor(finalAttack).toLocaleString();
             document.getElementById('realAttackPct').innerText = (townAttackPct + attackPct).toFixed(1) + '%';
             document.getElementById('realAdvAttackPct').innerText = advAttackPct.toFixed(1) + '%';
