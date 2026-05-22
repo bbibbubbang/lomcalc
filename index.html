@@ -1565,66 +1565,20 @@
             autoDefensePct += eqStats.autoDefensePct;
             autoHpPct += eqStats.autoHpPct;
 
-            // Recalculate finalAttack with equipment
-            finalAttack = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + advAttackPct / 100);
-            finalAttack = finalAttack * (1 + autoAttackPct / 100);
+            // 1단계: 역산된 기본 스탯에 % 배율만 먼저 적용 (이 값들을 고정으로 사용해야 함)
+            const buffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + advAttackPct / 100) * (1 + autoAttackPct / 100);
+            const buffedD = originalDefense * (1 + (townDefensePct + defensePct) / 100) * (1 + advDefensePct / 100) * (1 + autoDefensePct / 100);
+            const buffedH = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + advHpPct / 100) * (1 + autoHpPct / 100);
 
-            // Recalculate finalDefense with equipment
-            finalDefense = originalDefense * (1 + (townDefensePct + defensePct) / 100);
-            finalDefense = finalDefense * (1 + advDefensePct / 100);
-            finalDefense = finalDefense * (1 + autoDefensePct / 100);
-
-            // finalAttack for Basic Attack (excluding Twilight buff)
             const basicAdvAttackPct = advAttackPct - twilightAdvAttackPct;
-            let basicFinalAttack = originalAttack * (1 + (townAttackPct + attackPct) / 100);
-            basicFinalAttack = basicFinalAttack * (1 + basicAdvAttackPct / 100);
-            basicFinalAttack = basicFinalAttack * (1 + autoAttackPct / 100);
+            const basicBuffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + basicAdvAttackPct / 100) * (1 + autoAttackPct / 100);
 
-            let mapleLeafDefToAtkLevelGlobal = val('platinumMapleLeafDefLevel') || 0;
-            let mapleLeafAtkToDefLevelGlobal = val('platinumMapleLeafAtkToDefLevel') || 0;
-            let mapleLeafAtkToHpLevelGlobal = val('platinumMapleLeafAtkToHpLevel') || 0;
-            let mapleLeafHpToAtkLevelGlobal = val('platinumMapleLeafHpToAtkLevel') || 0;
-            let mapleLeafDefToHpLevelGlobal = val('platinumMapleLeafDefToHpLevel') || 0;
-            let mapleLeafHpToDefLevelGlobal = val('platinumMapleLeafHpToDefLevel') || 0;
+            // 2단계: 백금 단풍잎 보너스를 '동시에' 계산하여 최종 합산 (순차적 갱신 절대 금지)
+            finalAttack = buffedA + Math.floor(buffedD / 100) * (Cad * 100) + Math.floor(buffedH / 1000) * (Cah * 1000);
+            finalDefense = buffedD + Math.floor(buffedA / 100) * (Cda * 100) + Math.floor(buffedH / 1000) * (Cdh * 1000);
+            finalHP = buffedH + Math.floor(buffedA / 100) * (Cha * 100) + Math.floor(buffedD / 100) * (Chd * 100);
 
-            let globalMapleLeafAtkBonus = 0;
-            let globalMapleLeafDefBonus = 0;
-            let globalMapleLeafHpBonus = 0;
-
-            if (mapleLeafDefToAtkLevelGlobal > 0) {
-                globalMapleLeafAtkBonus += mapleLeafDefToAtkLevelGlobal * Math.floor(finalDefense / 100) * 4;
-            }
-            if (mapleLeafHpToAtkLevelGlobal > 0) {
-                globalMapleLeafAtkBonus += mapleLeafHpToAtkLevelGlobal * Math.floor(finalHP / 1000) * 2;
-            }
-            if (mapleLeafAtkToDefLevelGlobal > 0) {
-                globalMapleLeafDefBonus += mapleLeafAtkToDefLevelGlobal * Math.floor(finalAttack / 100) * 1;
-            }
-            if (mapleLeafAtkToHpLevelGlobal > 0) {
-                globalMapleLeafHpBonus += mapleLeafAtkToHpLevelGlobal * Math.floor(finalAttack / 100) * 20;
-            }
-            if (mapleLeafDefToHpLevelGlobal > 0) {
-                globalMapleLeafHpBonus += mapleLeafDefToHpLevelGlobal * Math.floor(finalDefense / 100) * 40;
-            }
-            if (mapleLeafHpToDefLevelGlobal > 0) {
-                globalMapleLeafDefBonus += mapleLeafHpToDefLevelGlobal * Math.floor(finalHP / 1000) * 1;
-            }
-
-            if (globalMapleLeafAtkBonus > 0) {
-                finalAttack += globalMapleLeafAtkBonus;
-                basicFinalAttack += globalMapleLeafAtkBonus;
-            }
-            if (globalMapleLeafDefBonus > 0) {
-                finalDefense += globalMapleLeafDefBonus;
-            }
-
-            // Recalculate finalHP with equipment and advHpPct
-            finalHP = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + advHpPct / 100);
-            finalHP = finalHP * (1 + autoHpPct / 100);
-
-            if (globalMapleLeafHpBonus > 0) {
-                finalHP += globalMapleLeafHpBonus;
-            }
+            let basicFinalAttack = basicBuffedA + Math.floor(buffedD / 100) * (Cad * 100) + Math.floor(buffedH / 1000) * (Cah * 1000);
 
             let hardModePenalty = val('hardModePenalty');
             if (hardModePenalty > 0) {
@@ -1747,72 +1701,34 @@
                 let iAttackPct = attackPct - eqStats.attackPct + intervalEqStats.attackPct;
                 let iAdvAttackPct = advAttackPct - eqStats.advAttackPct + intervalEqStats.advAttackPct;
                 let iAutoAttackPct = autoAttackPct - eqStats.autoAttackPct + intervalEqStats.autoAttackPct;
-                let iFinalAttack = originalAttack * (1 + iAttackPct / 100) * (1 + iAdvAttackPct / 100);
-                iFinalAttack = iFinalAttack * (1 + iAutoAttackPct / 100);
 
                 let iDefensePct = defensePct - eqStats.defensePct + intervalEqStats.defensePct;
                 let iAdvDefensePct = advDefensePct - eqStats.advDefensePct + intervalEqStats.advDefensePct;
                 let iAutoDefensePct = autoDefensePct - eqStats.autoDefensePct + intervalEqStats.autoDefensePct;
                 let iAutoHpPct = autoHpPct - eqStats.autoHpPct + intervalEqStats.autoHpPct;
-                let iFinalDefense = originalDefense * (1 + (townDefensePct + iDefensePct) / 100);
-                iFinalDefense = iFinalDefense * (1 + iAdvDefensePct / 100);
-                iFinalDefense = iFinalDefense * (1 + iAutoDefensePct / 100);
 
                 let iBasicAdvAttackPct = iAdvAttackPct - iTwilightAdvAttackPct;
-                let iBasicFinalAttack = originalAttack * (1 + (townAttackPct + iAttackPct) / 100);
-                iBasicFinalAttack = iBasicFinalAttack * (1 + iBasicAdvAttackPct / 100);
-                iBasicFinalAttack = iBasicFinalAttack * (1 + iAutoAttackPct / 100);
-
-                let mapleLeafDefToAtkLevel = val('platinumMapleLeafDefLevel') || 0;
-                let mapleLeafAtkToDefLevel = val('platinumMapleLeafAtkToDefLevel') || 0;
-                let mapleLeafAtkToHpLevel = val('platinumMapleLeafAtkToHpLevel') || 0;
-                let mapleLeafHpToAtkLevel = val('platinumMapleLeafHpToAtkLevel') || 0;
-                let mapleLeafDefToHpLevel = val('platinumMapleLeafDefToHpLevel') || 0;
-                let mapleLeafHpToDefLevel = val('platinumMapleLeafHpToDefLevel') || 0;
-
-                let mapleLeafAtkBonus = 0;
-                let mapleLeafDefBonus = 0;
-                let mapleLeafHpBonus = 0;
 
                 let iAdvHpPct = advHpPct - eqStats.advHpPct + intervalEqStats.advHpPct;
-                let iFinalHP = originalHP * (1 + (townHpPct + hpPct) / 100);
-                iFinalHP = iFinalHP * (1 + iAdvHpPct / 100);
-                iFinalHP = iFinalHP * (1 + iAutoHpPct / 100);
 
-                if (mapleLeafDefToAtkLevel > 0) {
-                    mapleLeafAtkBonus += mapleLeafDefToAtkLevel * Math.floor(iFinalDefense / 100) * 4;
-                }
-                if (mapleLeafHpToAtkLevel > 0) {
-                    mapleLeafAtkBonus += mapleLeafHpToAtkLevel * Math.floor(iFinalHP / 1000) * 2;
-                }
-                if (mapleLeafAtkToDefLevel > 0) {
-                    mapleLeafDefBonus += mapleLeafAtkToDefLevel * Math.floor(iFinalAttack / 100) * 1;
-                }
-                if (mapleLeafAtkToHpLevel > 0) {
-                    mapleLeafHpBonus += mapleLeafAtkToHpLevel * Math.floor(iFinalAttack / 100) * 20;
-                }
-                if (mapleLeafDefToHpLevel > 0) {
-                    mapleLeafHpBonus += mapleLeafDefToHpLevel * Math.floor(iFinalDefense / 100) * 40;
-                }
-                if (mapleLeafHpToDefLevel > 0) {
-                    mapleLeafDefBonus += mapleLeafHpToDefLevel * Math.floor(iFinalHP / 1000) * 1;
-                }
+                // 1단계: 역산된 기본 스탯에 % 배율만 먼저 적용 (이 값들을 고정으로 사용해야 함)
+                const iBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + iAdvAttackPct / 100) * (1 + iAutoAttackPct / 100);
+                const iBuffedD = originalDefense * (1 + (townDefensePct + iDefensePct) / 100) * (1 + iAdvDefensePct / 100) * (1 + iAutoDefensePct / 100);
+                const iBuffedH = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + iAdvHpPct / 100) * (1 + iAutoHpPct / 100);
+                const iBasicBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + iBasicAdvAttackPct / 100) * (1 + iAutoAttackPct / 100);
 
-                if (mapleLeafAtkBonus > 0) {
-                    iFinalAttack += mapleLeafAtkBonus;
-                    iBasicFinalAttack += mapleLeafAtkBonus;
-                }
-                if (mapleLeafDefBonus > 0) {
-                    iFinalDefense += mapleLeafDefBonus;
-                }
-                // HP is not interval dependent in calculations right now, but for completeness or if it were:
-                // iFinalHP += mapleLeafHpBonus;
+                // 2단계: 백금 단풍잎 보너스를 '동시에' 계산하여 최종 합산 (순차적 갱신 절대 금지)
+                let iFinalAttack = iBuffedA + Math.floor(iBuffedD / 100) * (Cad * 100) + Math.floor(iBuffedH / 1000) * (Cah * 1000);
+                let iFinalDefense = iBuffedD + Math.floor(iBuffedA / 100) * (Cda * 100) + Math.floor(iBuffedH / 1000) * (Cdh * 1000);
+                let iFinalHP = iBuffedH + Math.floor(iBuffedA / 100) * (Cha * 100) + Math.floor(iBuffedD / 100) * (Chd * 100);
+                let iBasicFinalAttack = iBasicBuffedA + Math.floor(iBuffedD / 100) * (Cad * 100) + Math.floor(iBuffedH / 1000) * (Cah * 1000);
 
                 if (hardModePenalty > 0) {
                     let penaltyMultiplier = hardModePenalty / 100;
                     iFinalAttack *= penaltyMultiplier;
                     iBasicFinalAttack *= penaltyMultiplier;
                     iFinalDefense *= penaltyMultiplier;
+                    iFinalHP *= penaltyMultiplier;
                 }
 
                 let iMyClassDmg = 0;
