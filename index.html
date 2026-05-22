@@ -1091,6 +1091,48 @@
         }
         document.addEventListener('change', handleEquipmentChange);
 
+        /**
+         * 백금 단풍잎 보너스 역산 함수 (크래머 공식 적용)
+         * * @param {number} Af - 최종 공격력
+         * @param {number} Df - 최종 방어력
+         * @param {number} Hf - 최종 체력
+         * @param {number} Cad - 방어력 -> 공격력 변환 비율 (예: 100당 40이면 0.4)
+         * @param {number} Cah - 체력 -> 공격력 변환 비율 (예: 1000당 20이면 0.02)
+         * @param {number} Cda - 공격력 -> 방어력 변환 비율
+         * @param {number} Cdh - 체력 -> 방어력 변환 비율
+         * @param {number} Cha - 공격력 -> 체력 변환 비율
+         * @param {number} Chd - 방어력 -> 체력 변환 비율
+         * @returns {object} 백금 단풍잎 효과가 제거된 스탯 { baseA, baseD, baseH }
+         */
+        function removePlatinumLeafBonus(Af, Df, Hf, Cad, Cah, Cda, Cdh, Cha, Chd) {
+            const delta = 1 - (Cdh * Chd) - (Cad * Cda)
+                        + (Cad * Cdh * Cha) + (Cah * Cda * Chd)
+                        - (Cah * Cha);
+
+            if (delta === 0) {
+                console.error("계산 오류: 행렬식이 0입니다.");
+                return { baseA: Af, baseD: Df, baseH: Hf };
+            }
+
+            const numA = Af * (1 - Cdh * Chd)
+                       - Df * (Cad - Cah * Chd)
+                       + Hf * (Cad * Cdh - Cah);
+
+            const numD = -Af * (Cda - Cha * Cdh)
+                       + Df * (1 - Cah * Cha)
+                       - Hf * (Cdh - Cah * Cda);
+
+            const numH = Af * (Cda * Chd - Cha)
+                       - Df * (Chd - Cad * Cha)
+                       + Hf * (1 - Cad * Cda);
+
+            const baseA = Math.round(numA / delta);
+            const baseD = Math.round(numD / delta);
+            const baseH = Math.round(numH / delta);
+
+            return { baseA, baseD, baseH };
+        }
+
         function unequipAll() {
             document.querySelectorAll('.equip-type-select').forEach(el => el.value = '없음');
             document.querySelectorAll('.equip-grade-select').forEach(el => el.value = '1');
@@ -1237,33 +1279,19 @@
             let initMapleLeafDefToHpLevel = val('platinumMapleLeafDefToHpLevel') || 0;
             let initMapleLeafHpToDefLevel = val('platinumMapleLeafHpToDefLevel') || 0;
 
-            let initMapleLeafAtkBonus = 0;
-            let initMapleLeafDefBonus = 0;
-            let initMapleLeafHpBonus = 0;
+            let Cad = initMapleLeafDefToAtkLevel * 4 / 100;
+            let Cah = initMapleLeafHpToAtkLevel * 2 / 1000;
+            let Cda = initMapleLeafAtkToDefLevel * 1 / 100;
+            let Cdh = initMapleLeafHpToDefLevel * 1 / 1000;
+            let Cha = initMapleLeafAtkToHpLevel * 20 / 100;
+            let Chd = initMapleLeafDefToHpLevel * 40 / 100;
 
-            if (initMapleLeafDefToAtkLevel > 0) {
-                initMapleLeafAtkBonus += initMapleLeafDefToAtkLevel * Math.floor(finalDefense / 100) * 4;
-            }
-            if (initMapleLeafHpToAtkLevel > 0) {
-                initMapleLeafAtkBonus += initMapleLeafHpToAtkLevel * Math.floor(finalHP / 1000) * 2;
-            }
-            if (initMapleLeafAtkToDefLevel > 0) {
-                initMapleLeafDefBonus += initMapleLeafAtkToDefLevel * Math.floor(finalAttack / 100) * 1;
-            }
-            if (initMapleLeafHpToDefLevel > 0) {
-                initMapleLeafDefBonus += initMapleLeafHpToDefLevel * Math.floor(finalHP / 1000) * 1;
-            }
-            if (initMapleLeafAtkToHpLevel > 0) {
-                initMapleLeafHpBonus += initMapleLeafAtkToHpLevel * Math.floor(finalAttack / 100) * 20;
-            }
-            if (initMapleLeafDefToHpLevel > 0) {
-                initMapleLeafHpBonus += initMapleLeafDefToHpLevel * Math.floor(finalDefense / 100) * 40;
-            }
+            const baseLeafStats = removePlatinumLeafBonus(finalAttack, finalDefense, finalHP, Cad, Cah, Cda, Cdh, Cha, Chd);
 
             // 역산: 순수 기본 능력치는 단풍잎을 뺀 후 마을 %를 나눈 값
-            let originalAttack = Math.max(0, finalAttack - initMapleLeafAtkBonus) / (1 + townAttackPct / 100);
-            let originalDefense = Math.max(0, finalDefense - initMapleLeafDefBonus) / (1 + townDefensePct / 100);
-            let originalHP = Math.max(0, finalHP - initMapleLeafHpBonus) / (1 + townHpPct / 100);
+            let originalAttack = Math.max(0, baseLeafStats.baseA) / (1 + townAttackPct / 100);
+            let originalDefense = Math.max(0, baseLeafStats.baseD) / (1 + townDefensePct / 100);
+            let originalHP = Math.max(0, baseLeafStats.baseH) / (1 + townHpPct / 100);
 
             // Calculate extra attack from inputs
             let extraAtk = 0;
@@ -2007,9 +2035,9 @@
             document.getElementById('resTotalDmg').innerText = Math.floor(totalDmg).toLocaleString();
 
             // Update Real Stats Section
-            let pureOriginalAttack = Math.max(0, val('finalAttack') - initMapleLeafAtkBonus) / (1 + val('townAttackPct') / 100);
-            let pureOriginalDefense = Math.max(0, val('finalDefense') - initMapleLeafDefBonus) / (1 + val('townDefensePct') / 100);
-            let pureOriginalHP = Math.max(0, val('finalHP') - initMapleLeafHpBonus) / (1 + val('townHpPct') / 100);
+            let pureOriginalAttack = originalAttack;
+            let pureOriginalDefense = originalDefense;
+            let pureOriginalHP = originalHP;
 
             document.getElementById('realOriginalAttack').innerText = Math.floor(pureOriginalAttack).toLocaleString();
             document.getElementById('realOriginalDefense').innerText = Math.floor(pureOriginalDefense).toLocaleString();
