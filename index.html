@@ -1126,9 +1126,37 @@
                        - Df * (Chd - Cad * Cha)
                        + Hf * (1 - Cad * Cda);
 
-            const baseA = Math.round(numA / delta);
-            const baseD = Math.round(numD / delta);
-            const baseH = Math.round(numH / delta);
+            let baseA = Math.round(numA / delta);
+            let baseD = Math.round(numD / delta);
+            let baseH = Math.round(numH / delta);
+
+            const maxIter = 100;
+            for (let i = 0; i < maxIter; i++) {
+                let currentFinalA = baseA + (baseD * Cad) + (baseH * Cah);
+                let currentFinalD = baseD + (baseA * Cda) + (baseH * Cdh);
+                let currentFinalH = baseH + (baseA * Cha) + (baseD * Chd);
+
+                let calcFinalA = Math.floor(currentFinalA);
+                let calcFinalD = Math.floor(currentFinalD);
+                let calcFinalH = Math.floor(currentFinalH);
+
+                let errorA = calcFinalA - Af;
+                let errorD = calcFinalD - Df;
+                let errorH = calcFinalH - Hf;
+
+                if (errorA === 0 && errorD === 0 && errorH === 0) {
+                    break;
+                }
+
+                if (errorA > 0) baseA -= 1;
+                else if (errorA < 0) baseA += 1;
+
+                if (errorD > 0) baseD -= 1;
+                else if (errorD < 0) baseD += 1;
+
+                if (errorH > 0) baseH -= 1;
+                else if (errorH < 0) baseH += 1;
+            }
 
             return { baseA, baseD, baseH };
         }
