@@ -4,11 +4,13 @@ def test_victory_pet_dps():
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
+        page.route('https://cdn.tailwindcss.com', lambda route: route.abort())
         page.goto('http://localhost:8000', wait_until='domcontentloaded')
 
         # set basic values
         # Ensure the section is visible before interacting
         page.evaluate("document.getElementById('manualStatsSection').style.display = 'block'")
+        page.evaluate("document.getElementById('townStatsSection').style.display = 'block'")
         page.fill('#finalAttack', '1000')
 
         # equip Victory pet in equipPet1Type

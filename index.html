@@ -137,7 +137,7 @@
                 </button>
             </div>
             <div class="text-gray-700 space-y-2">
-                <p>모든 장비,펫 착용 해제 후 인게임 스텟>세부 능력치에 나와있는 값을 "직접 입력 데미지 설정"에 기입하세요.</p>
+                <p>모든 장비,펫 착용 해제 후 인게임 스텟>세부 능력치에 나와있는 값을 "마을 능력치" 및 "추가 데미지"에 기입하세요.</p>
                 <p>아티팩트 설정에 실제 적용되는 수치를 기입하세요.</p>
                 <p>치장은 미구현 상태이므로 인게임 착용상태로 두고, 수치 기입하지 마세요.</p>
                 <p>무릉 연습장에서 테스트하시려면 일반몬스터로 설정해주세요.</p>
@@ -153,14 +153,14 @@
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                 <div class="flex items-center cursor-pointer" onclick="toggleSection('equipSection', 'equipArrow', 'equipBtnGroup')">
                     <h2 class="text-xl font-bold text-indigo-600">장비 설정</h2>
-                    <span id="equipArrow" class="ml-2 text-indigo-600">▼</span>
+                    <span id="equipArrow" class="ml-2 text-indigo-600">▶</span>
                 </div>
-                <div id="equipBtnGroup" class="flex items-center">
+                <div id="equipBtnGroup" class="flex items-center" style="display: none;">
                     <button onclick="unequipAll()" class="text-sm bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition duration-200 ml-4">장비 모두 해제</button>
                 </div>
             </div>
 
-            <div id="equipSection" class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div id="equipSection" class="grid grid-cols-1 md:grid-cols-12 gap-6" style="display: none;">
                 <!-- 1분류: 장비 -->
                 <div class="md:col-span-6">
                     <h3 class="font-bold text-gray-600 mb-2">1분류 (장비)</h3>
@@ -250,9 +250,9 @@
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                 <div class="flex items-center cursor-pointer" onclick="toggleSection('artifactSection', 'artifactArrow', 'artifactBtnGroup')">
                     <h2 class="text-xl font-bold text-green-600">아티팩트 설정</h2>
-                    <span id="artifactArrow" class="ml-2 text-green-600">▼</span>
+                    <span id="artifactArrow" class="ml-2 text-green-600">▶</span>
                 </div>
-                <div id="artifactBtnGroup" class="flex items-center">
+                <div id="artifactBtnGroup" class="flex items-center" style="display: none;">
                     <button onclick="setArtifactsUniqueMax()" class="text-sm bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg transition duration-200 ml-4">유니크 이하 최대레벨 설정</button>
                 </div>
             </div>
@@ -285,10 +285,83 @@
             </div>
         </div>
         
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-purple-400">
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-orange-400">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <div class="flex items-center cursor-pointer" onclick="toggleSection('townStatsSection', 'townStatsArrow')">
+                    <h2 class="text-xl font-bold text-orange-600">마을 능력치</h2>
+                    <span id="townStatsArrow" class="ml-2 text-orange-600">▶</span>
+                </div>
+            </div>
+
+            <div id="townStatsSection" style="display: none;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-xl font-bold mb-4 text-orange-500 border-b pb-2">기본 마을 능력치</h2>
+                        <div class="form-group">
+                            <label>최종 공격력</label>
+                            <input type="number" id="finalAttack" class="calc-input" value="1000">
+                        </div>
+                        <div class="form-group">
+                            <label>최종 방어력</label>
+                            <input type="number" id="finalDefense" class="calc-input" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>최종 체력</label>
+                            <input type="number" id="finalHP" class="calc-input" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>공격력 (%)</label>
+                            <input type="number" id="townAttackPct" class="calc-input" value="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>방어력 (%)</label>
+                            <input type="number" id="townDefensePct" class="calc-input" value="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>체력 (%)</label>
+                            <input type="number" id="townHpPct" class="calc-input" value="0" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-xl font-bold mb-4 text-orange-500 border-b pb-2">백금단풍잎</h2>
+                        <div class="form-group">
+                            <label>방어력 당 공격력 레벨 (0~10)</label>
+                            <input type="number" id="platinumMapleLeafDefLevel" class="calc-input" value="0" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>체력 당 공격력 레벨 (0~10)</label>
+                            <input type="number" id="platinumMapleLeafHpToAtkLevel" class="calc-input" value="0" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>공격력 당 방어력 레벨 (0~10)</label>
+                            <input type="number" id="platinumMapleLeafAtkToDefLevel" class="calc-input" value="0" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>공격력 당 체력 레벨 (0~10)</label>
+                            <input type="number" id="platinumMapleLeafAtkToHpLevel" class="calc-input" value="0" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>방어력 당 체력 레벨 (0~10)</label>
+                            <input type="number" id="platinumMapleLeafDefToHpLevel" class="calc-input" value="0" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>체력 당 방어력 레벨 (0~10)</label>
+                            <input type="number" id="platinumMapleLeafHpToDefLevel" class="calc-input" value="0" min="0" max="10">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center border-t pb-2 pt-4">
+                    <button onclick="toggleSection('townStatsSection', 'townStatsArrow')" class="text-orange-600 font-bold hover:text-orange-800">▲ 접기</button>
+                </div>
+            </div>
+        </div>
+
+<div class="bg-white p-6 rounded-lg shadow-md mb-6 border-2 border-purple-400">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                 <div class="flex items-center cursor-pointer" onclick="toggleSection('manualStatsSection', 'manualStatsArrow')">
-                    <h2 class="text-xl font-bold text-purple-600">직접 입력 데미지 설정</h2>
+                    <h2 class="text-xl font-bold text-purple-600">추가 데미지</h2>
                     <span id="manualStatsArrow" class="ml-2 text-purple-600">▶</span>
                 </div>
             </div>
@@ -299,10 +372,6 @@
                     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                 <h2 class="text-xl font-bold mb-4 text-blue-600 border-b pb-2">기본 능력치</h2>
                 <div class="form-group">
-                    <label>최종 공격력</label>
-                    <input type="number" id="finalAttack" class="calc-input" value="1000">
-                </div>
-                <div class="form-group">
                     <label>공격력 (%)</label>
                     <input type="number" id="attackPct" class="calc-input" value="0" step="0.1">
                 </div>
@@ -311,21 +380,12 @@
                     <input type="number" id="advAttackPct" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
-                    <label>최종 방어력</label>
-                    <input type="number" id="finalDefense" class="calc-input" value="0">
-                </div>
-                <div class="form-group">
                     <label>방어력 (%)</label>
                     <input type="number" id="defensePct" class="calc-input" value="0" step="0.1">
                 </div>
                 <div class="form-group">
                     <label>방어력(모험) (%)</label>
                     <input type="number" id="advDefensePct" class="calc-input" value="0" step="0.1">
-                </div>
-
-                <div class="form-group">
-                    <label>최종 체력</label>
-                    <input type="number" id="finalHP" class="calc-input" value="0">
                 </div>
                 <div class="form-group">
                     <label>체력 (%)</label>
@@ -359,33 +419,6 @@
                     <label>오토 시 체력 (%)</label>
                     <input type="number" id="autoHpPct" class="calc-input" value="0" step="0.1">
                 </div>
-
-                <h2 class="text-xl font-bold mt-6 mb-4 text-orange-500 border-b pb-2">백금단풍잎</h2>
-                <div class="form-group">
-                    <label>방어력 당 공격력 레벨 (0~10)</label>
-                    <input type="number" id="platinumMapleLeafDefLevel" class="calc-input" value="0" min="0" max="10">
-                </div>
-                <div class="form-group">
-                    <label>체력 당 공격력 레벨 (0~10)</label>
-                    <input type="number" id="platinumMapleLeafHpToAtkLevel" class="calc-input" value="0" min="0" max="10">
-                </div>
-                <div class="form-group">
-                    <label>공격력 당 방어력 레벨 (0~10)</label>
-                    <input type="number" id="platinumMapleLeafAtkToDefLevel" class="calc-input" value="0" min="0" max="10">
-                </div>
-                <div class="form-group">
-                    <label>공격력 당 체력 레벨 (0~10)</label>
-                    <input type="number" id="platinumMapleLeafAtkToHpLevel" class="calc-input" value="0" min="0" max="10">
-                </div>
-                <div class="form-group">
-                    <label>방어력 당 체력 레벨 (0~10)</label>
-                    <input type="number" id="platinumMapleLeafDefToHpLevel" class="calc-input" value="0" min="0" max="10">
-                </div>
-                <div class="form-group">
-                    <label>체력 당 방어력 레벨 (0~10)</label>
-                    <input type="number" id="platinumMapleLeafHpToDefLevel" class="calc-input" value="0" min="0" max="10">
-                </div>
-
                 <h2 class="text-xl font-bold mt-6 mb-4 text-purple-600 border-b pb-2">몬스터 및 기타 데미지</h2>
                 <div class="form-group">
                     <label>기본공격 피해량 (%)</label>
@@ -613,10 +646,21 @@
             </div>
 
             <div id="realStatsSection">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Column 1: Base & Class -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+                    <!-- Column 1: Base -->
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h3 class="font-bold text-blue-600 border-b pb-1 mb-2">기본 및 직업</h3>
+                        <h3 class="font-bold text-blue-600 border-b pb-1 mb-2">기본 능력치</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span class="text-gray-600">기본 공격력</span><span id="realOriginalAttack" class="font-bold">0</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본 방어력</span><span id="realOriginalDefense" class="font-bold">0</span></div>
+                            <div class="flex justify-between"><span class="text-gray-600">기본 체력</span><span id="realOriginalHP" class="font-bold">0</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Additional Stats -->
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 class="font-bold text-blue-600 border-b pb-1 mb-2">추가 능력치</h3>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between"><span class="text-gray-600">최종 공격력</span><span id="realFinalAttack" class="font-bold">0</span></div>
                             <div class="flex justify-between"><span class="text-gray-600">공격력 (%)</span><span id="realAttackPct" class="font-bold">0%</span></div>
@@ -843,15 +887,24 @@
             const section = document.getElementById(sectionId);
             const arrow = document.getElementById(arrowId);
             const btnGroup = document.getElementById(btnGroupId);
+            let state = '';
             if (section.style.display === 'none') {
                 section.style.display = '';
                 arrow.innerText = '▼';
                 if (btnGroup) btnGroup.style.display = '';
+                state = 'open';
             } else {
                 section.style.display = 'none';
                 arrow.innerText = '▶';
                 if (btnGroup) btnGroup.style.display = 'none';
+                state = 'closed';
             }
+
+            // Save state
+            let states = getCookie('mapleCalcSectionStates');
+            states = states ? JSON.parse(states) : {};
+            states[sectionId] = state;
+            setCookie('mapleCalcSectionStates', JSON.stringify(states), 30);
         }
 
         function setArtifactsUniqueMax() {
@@ -1083,10 +1136,49 @@
                             } else {
                                 input.value = parsed[input.id];
                             }
+                            // Dispatch change event to trigger update dynamically dependent UI elements (Memory rule)
+                            if (input.classList.contains('equip-type-select')) {
+                                input.dispatchEvent(new Event('change'));
+                            }
                         }
                     });
                 } catch (e) {
                     console.error("Cookie parsing error", e);
+                }
+            }
+
+            const savedStates = getCookie('mapleCalcSectionStates');
+            if (savedStates) {
+                try {
+                    const states = JSON.parse(savedStates);
+                    const sections = [
+                        {id: 'equipSection', arrow: 'equipArrow', btnGroup: 'equipBtnGroup'},
+                        {id: 'artifactSection', arrow: 'artifactArrow', btnGroup: 'artifactBtnGroup'},
+                        {id: 'townStatsSection', arrow: 'townStatsArrow'},
+                        {id: 'manualStatsSection', arrow: 'manualStatsArrow'},
+                        {id: 'realStatsSection', arrow: 'realStatsArrow'}
+                    ];
+
+                    sections.forEach(sec => {
+                        if (states[sec.id]) {
+                            const sectionEl = document.getElementById(sec.id);
+                            const arrowEl = document.getElementById(sec.arrow);
+                            const btnGroupEl = sec.btnGroup ? document.getElementById(sec.btnGroup) : null;
+                            if (sectionEl && arrowEl) {
+                                if (states[sec.id] === 'open') {
+                                    sectionEl.style.display = '';
+                                    arrowEl.innerText = '▼';
+                                    if (btnGroupEl) btnGroupEl.style.display = '';
+                                } else {
+                                    sectionEl.style.display = 'none';
+                                    arrowEl.innerText = '▶';
+                                    if (btnGroupEl) btnGroupEl.style.display = 'none';
+                                }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Section state parsing error", e);
                 }
             }
 
@@ -1117,25 +1209,61 @@
             const str = (id) => document.getElementById(id).value;
             const isChecked = (id) => document.getElementById(id).checked;
 
-            // 1. 역산: 원본 공격력
+            // 1. 역산: 원본 능력치 (마을 능력치 기준)
             let finalAttack = val('finalAttack');
+            let townAttackPct = val('townAttackPct');
             let attackPct = val('attackPct');
             let advAttackPct = val('advAttackPct');
 
-            let originalAttack = finalAttack / (1 + attackPct / 100);
-
-            let finalDefense = val('finalDefense');
-            let defensePct = val('defensePct');
-            let advDefensePct = val('advDefensePct');
             let autoAttackPct = val('autoAttackPct');
             let autoDefensePct = val('autoDefensePct');
             let autoHpPct = val('autoHpPct');
 
-            let originalDefense = finalDefense / (1 + defensePct / 100);
+            let finalDefense = val('finalDefense');
+            let townDefensePct = val('townDefensePct');
+            let defensePct = val('defensePct');
+            let advDefensePct = val('advDefensePct');
+
             let finalHP = val('finalHP');
+            let townHpPct = val('townHpPct');
             let hpPct = val('hpPct') || 0;
             let advHpPct = val('advHpPct');
-            let originalHP = finalHP / (1 + hpPct / 100);
+
+            // Get Maple Leaf globally first to subtract from final stats before deriving original
+            let initMapleLeafDefToAtkLevel = val('platinumMapleLeafDefLevel') || 0;
+            let initMapleLeafAtkToDefLevel = val('platinumMapleLeafAtkToDefLevel') || 0;
+            let initMapleLeafAtkToHpLevel = val('platinumMapleLeafAtkToHpLevel') || 0;
+            let initMapleLeafHpToAtkLevel = val('platinumMapleLeafHpToAtkLevel') || 0;
+            let initMapleLeafDefToHpLevel = val('platinumMapleLeafDefToHpLevel') || 0;
+            let initMapleLeafHpToDefLevel = val('platinumMapleLeafHpToDefLevel') || 0;
+
+            let initMapleLeafAtkBonus = 0;
+            let initMapleLeafDefBonus = 0;
+            let initMapleLeafHpBonus = 0;
+
+            if (initMapleLeafDefToAtkLevel > 0) {
+                initMapleLeafAtkBonus += initMapleLeafDefToAtkLevel * Math.floor(finalDefense / 100) * 4;
+            }
+            if (initMapleLeafHpToAtkLevel > 0) {
+                initMapleLeafAtkBonus += initMapleLeafHpToAtkLevel * Math.floor(finalHP / 1000) * 2;
+            }
+            if (initMapleLeafAtkToDefLevel > 0) {
+                initMapleLeafDefBonus += initMapleLeafAtkToDefLevel * Math.floor(finalAttack / 100) * 12;
+            }
+            if (initMapleLeafHpToDefLevel > 0) {
+                initMapleLeafDefBonus += initMapleLeafHpToDefLevel * Math.floor(finalHP / 1000) * 8;
+            }
+            if (initMapleLeafAtkToHpLevel > 0) {
+                initMapleLeafHpBonus += initMapleLeafAtkToHpLevel * Math.floor(finalAttack / 100) * 50;
+            }
+            if (initMapleLeafDefToHpLevel > 0) {
+                initMapleLeafHpBonus += initMapleLeafDefToHpLevel * Math.floor(finalDefense / 100) * 15;
+            }
+
+            // 역산: 순수 기본 능력치는 단풍잎을 뺀 후 마을 %를 나눈 값
+            let originalAttack = (finalAttack - initMapleLeafAtkBonus) / (1 + townAttackPct / 100);
+            let originalDefense = (finalDefense - initMapleLeafDefBonus) / (1 + townDefensePct / 100);
+            let originalHP = (finalHP - initMapleLeafHpBonus) / (1 + townHpPct / 100);
 
             // Calculate extra attack from inputs
             let extraAtk = 0;
@@ -1410,17 +1538,17 @@
             autoHpPct += eqStats.autoHpPct;
 
             // Recalculate finalAttack with equipment
-            finalAttack = originalAttack * (1 + attackPct / 100) * (1 + advAttackPct / 100);
+            finalAttack = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + advAttackPct / 100);
             finalAttack = finalAttack * (1 + autoAttackPct / 100);
 
             // Recalculate finalDefense with equipment
-            finalDefense = originalDefense * (1 + defensePct / 100);
+            finalDefense = originalDefense * (1 + (townDefensePct + defensePct) / 100);
             finalDefense = finalDefense * (1 + advDefensePct / 100);
             finalDefense = finalDefense * (1 + autoDefensePct / 100);
 
             // finalAttack for Basic Attack (excluding Twilight buff)
             const basicAdvAttackPct = advAttackPct - twilightAdvAttackPct;
-            let basicFinalAttack = originalAttack * (1 + attackPct / 100);
+            let basicFinalAttack = originalAttack * (1 + (townAttackPct + attackPct) / 100);
             basicFinalAttack = basicFinalAttack * (1 + basicAdvAttackPct / 100);
             basicFinalAttack = basicFinalAttack * (1 + autoAttackPct / 100);
 
@@ -1463,7 +1591,7 @@
             }
 
             // Recalculate finalHP with equipment and advHpPct
-            finalHP = finalHP * (1 + advHpPct / 100);
+            finalHP = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + advHpPct / 100);
             finalHP = finalHP * (1 + autoHpPct / 100);
 
             if (globalMapleLeafHpBonus > 0) {
@@ -1598,12 +1726,12 @@
                 let iAdvDefensePct = advDefensePct - eqStats.advDefensePct + intervalEqStats.advDefensePct;
                 let iAutoDefensePct = autoDefensePct - eqStats.autoDefensePct + intervalEqStats.autoDefensePct;
                 let iAutoHpPct = autoHpPct - eqStats.autoHpPct + intervalEqStats.autoHpPct;
-                let iFinalDefense = originalDefense * (1 + iDefensePct / 100);
+                let iFinalDefense = originalDefense * (1 + (townDefensePct + iDefensePct) / 100);
                 iFinalDefense = iFinalDefense * (1 + iAdvDefensePct / 100);
                 iFinalDefense = iFinalDefense * (1 + iAutoDefensePct / 100);
 
                 let iBasicAdvAttackPct = iAdvAttackPct - iTwilightAdvAttackPct;
-                let iBasicFinalAttack = originalAttack * (1 + iAttackPct / 100);
+                let iBasicFinalAttack = originalAttack * (1 + (townAttackPct + iAttackPct) / 100);
                 iBasicFinalAttack = iBasicFinalAttack * (1 + iBasicAdvAttackPct / 100);
                 iBasicFinalAttack = iBasicFinalAttack * (1 + iAutoAttackPct / 100);
 
@@ -1619,7 +1747,7 @@
                 let mapleLeafHpBonus = 0;
 
                 let iAdvHpPct = advHpPct - eqStats.advHpPct + intervalEqStats.advHpPct;
-                let iFinalHP = originalHP * (1 + hpPct / 100);
+                let iFinalHP = originalHP * (1 + (townHpPct + hpPct) / 100);
                 iFinalHP = iFinalHP * (1 + iAdvHpPct / 100);
                 iFinalHP = iFinalHP * (1 + iAutoHpPct / 100);
 
@@ -1879,6 +2007,9 @@
             document.getElementById('resTotalDmg').innerText = Math.floor(totalDmg).toLocaleString();
 
             // Update Real Stats Section
+            document.getElementById('realOriginalAttack').innerText = Math.floor(originalAttack).toLocaleString();
+            document.getElementById('realOriginalDefense').innerText = Math.floor(originalDefense).toLocaleString();
+            document.getElementById('realOriginalHP').innerText = Math.floor(originalHP).toLocaleString();
             document.getElementById('realFinalAttack').innerText = Math.floor(finalAttack).toLocaleString();
             document.getElementById('realAttackPct').innerText = attackPct.toFixed(1) + '%';
             document.getElementById('realAdvAttackPct').innerText = advAttackPct.toFixed(1) + '%';
