@@ -1261,9 +1261,9 @@
             }
 
             // 역산: 순수 기본 능력치는 단풍잎을 뺀 후 마을 %를 나눈 값
-            let originalAttack = (finalAttack - initMapleLeafAtkBonus) / (1 + townAttackPct / 100);
-            let originalDefense = (finalDefense - initMapleLeafDefBonus) / (1 + townDefensePct / 100);
-            let originalHP = (finalHP - initMapleLeafHpBonus) / (1 + townHpPct / 100);
+            let originalAttack = Math.max(0, finalAttack - initMapleLeafAtkBonus) / (1 + townAttackPct / 100);
+            let originalDefense = Math.max(0, finalDefense - initMapleLeafDefBonus) / (1 + townDefensePct / 100);
+            let originalHP = Math.max(0, finalHP - initMapleLeafHpBonus) / (1 + townHpPct / 100);
 
             // Calculate extra attack from inputs
             let extraAtk = 0;
