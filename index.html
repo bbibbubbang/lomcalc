@@ -1315,9 +1315,22 @@
             let Chd = initMapleLeafDefToHpLevel * 40 / 100;
 
             // 역산: 순수 기본 능력치는 입력된 최종값을 마을 %로 나눈 값
-            let originalAttack = Math.max(0, finalAttack) / (1 + townAttackPct / 100);
-            let originalDefense = Math.max(0, finalDefense) / (1 + townDefensePct / 100);
-            let originalHP = Math.max(0, finalHP) / (1 + townHpPct / 100);
+            // 3x3 선형 방정식을 크라머 공식으로 역산하여 백금 단풍잎 보너스를 제외한 순수 값을 구함
+            let det = 1*(1*1 - Cdh*Chd) - Cad*(Cda*1 - Cdh*Cha) + Cah*(Cda*Chd - 1*Cha);
+            let pureA = 0, pureD = 0, pureH = 0;
+
+            if (det !== 0) {
+                let detX = finalAttack*(1*1 - Cdh*Chd) - Cad*(finalDefense*1 - Cdh*finalHP) + Cah*(finalDefense*Chd - 1*finalHP);
+                let detY = 1*(finalDefense*1 - Cdh*finalHP) - finalAttack*(Cda*1 - Cdh*Cha) + Cah*(Cda*finalHP - finalDefense*Cha);
+                let detZ = 1*(1*finalHP - finalDefense*Chd) - Cad*(Cda*finalHP - finalDefense*Cha) + finalAttack*(Cda*Chd - 1*Cha);
+                pureA = detX / det;
+                pureD = detY / det;
+                pureH = detZ / det;
+            }
+
+            let originalAttack = Math.max(0, pureA) / (1 + townAttackPct / 100);
+            let originalDefense = Math.max(0, pureD) / (1 + townDefensePct / 100);
+            let originalHP = Math.max(0, pureH) / (1 + townHpPct / 100);
 
             // Calculate extra attack from inputs
             let extraAtk = 0;
