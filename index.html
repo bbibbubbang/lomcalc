@@ -325,7 +325,12 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                        <h2 class="text-xl font-bold mb-4 text-orange-500 border-b pb-2">백금단풍잎</h2>
+                        <div class="flex justify-between items-center mb-4 border-b pb-2">
+                            <h2 class="text-xl font-bold text-orange-500">백금단풍잎</h2>
+                            <label class="flex items-center text-sm text-gray-600">
+                                <input type="checkbox" id="applyMapleLeafToBase" class="calc-input mr-2" checked> 기본 마을 능력치 역산 적용
+                            </label>
+                        </div>
                         <div class="form-group">
                             <label>방어력 당 공격력 레벨 (0~10)</label>
                             <input type="number" id="platinumMapleLeafDefLevel" class="calc-input" value="0" min="0" max="10">
@@ -1300,12 +1305,13 @@
             let advHpPct = val('advHpPct');
 
             // Get Maple Leaf globally first to subtract from final stats before deriving original
-            let initMapleLeafDefToAtkLevel = val('platinumMapleLeafDefLevel') || 0;
-            let initMapleLeafAtkToDefLevel = val('platinumMapleLeafAtkToDefLevel') || 0;
-            let initMapleLeafAtkToHpLevel = val('platinumMapleLeafAtkToHpLevel') || 0;
-            let initMapleLeafHpToAtkLevel = val('platinumMapleLeafHpToAtkLevel') || 0;
-            let initMapleLeafDefToHpLevel = val('platinumMapleLeafDefToHpLevel') || 0;
-            let initMapleLeafHpToDefLevel = val('platinumMapleLeafHpToDefLevel') || 0;
+            let applyMapleLeafToBase = document.getElementById('applyMapleLeafToBase') ? document.getElementById('applyMapleLeafToBase').checked : true;
+            let initMapleLeafDefToAtkLevel = applyMapleLeafToBase ? (val('platinumMapleLeafDefLevel') || 0) : 0;
+            let initMapleLeafAtkToDefLevel = applyMapleLeafToBase ? (val('platinumMapleLeafAtkToDefLevel') || 0) : 0;
+            let initMapleLeafAtkToHpLevel = applyMapleLeafToBase ? (val('platinumMapleLeafAtkToHpLevel') || 0) : 0;
+            let initMapleLeafHpToAtkLevel = applyMapleLeafToBase ? (val('platinumMapleLeafHpToAtkLevel') || 0) : 0;
+            let initMapleLeafDefToHpLevel = applyMapleLeafToBase ? (val('platinumMapleLeafDefToHpLevel') || 0) : 0;
+            let initMapleLeafHpToDefLevel = applyMapleLeafToBase ? (val('platinumMapleLeafHpToDefLevel') || 0) : 0;
 
             let Cad = initMapleLeafDefToAtkLevel * 4 / 100;
             let Cah = initMapleLeafHpToAtkLevel * 2 / 1000;
