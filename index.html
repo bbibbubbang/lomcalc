@@ -1306,29 +1306,44 @@
 
             // Get Maple Leaf globally first to subtract from final stats before deriving original
             let applyMapleLeafToBase = document.getElementById('applyMapleLeafToBase') ? document.getElementById('applyMapleLeafToBase').checked : true;
-            let initMapleLeafDefToAtkLevel = applyMapleLeafToBase ? (val('platinumMapleLeafDefLevel') || 0) : 0;
-            let initMapleLeafAtkToDefLevel = applyMapleLeafToBase ? (val('platinumMapleLeafAtkToDefLevel') || 0) : 0;
-            let initMapleLeafAtkToHpLevel = applyMapleLeafToBase ? (val('platinumMapleLeafAtkToHpLevel') || 0) : 0;
-            let initMapleLeafHpToAtkLevel = applyMapleLeafToBase ? (val('platinumMapleLeafHpToAtkLevel') || 0) : 0;
-            let initMapleLeafDefToHpLevel = applyMapleLeafToBase ? (val('platinumMapleLeafDefToHpLevel') || 0) : 0;
-            let initMapleLeafHpToDefLevel = applyMapleLeafToBase ? (val('platinumMapleLeafHpToDefLevel') || 0) : 0;
 
-            let Cad = initMapleLeafDefToAtkLevel * 4 / 100;
-            let Cah = initMapleLeafHpToAtkLevel * 2 / 1000;
-            let Cda = initMapleLeafAtkToDefLevel * 1 / 100;
-            let Cdh = initMapleLeafHpToDefLevel * 1 / 1000;
-            let Cha = initMapleLeafAtkToHpLevel * 20 / 100;
-            let Chd = initMapleLeafDefToHpLevel * 40 / 100;
+            let globalMapleLeafDefToAtkLevel = val('platinumMapleLeafDefLevel') || 0;
+            let globalMapleLeafAtkToDefLevel = val('platinumMapleLeafAtkToDefLevel') || 0;
+            let globalMapleLeafAtkToHpLevel = val('platinumMapleLeafAtkToHpLevel') || 0;
+            let globalMapleLeafHpToAtkLevel = val('platinumMapleLeafHpToAtkLevel') || 0;
+            let globalMapleLeafDefToHpLevel = val('platinumMapleLeafDefToHpLevel') || 0;
+            let globalMapleLeafHpToDefLevel = val('platinumMapleLeafHpToDefLevel') || 0;
+
+            let initMapleLeafDefToAtkLevel = applyMapleLeafToBase ? globalMapleLeafDefToAtkLevel : 0;
+            let initMapleLeafAtkToDefLevel = applyMapleLeafToBase ? globalMapleLeafAtkToDefLevel : 0;
+            let initMapleLeafAtkToHpLevel = applyMapleLeafToBase ? globalMapleLeafAtkToHpLevel : 0;
+            let initMapleLeafHpToAtkLevel = applyMapleLeafToBase ? globalMapleLeafHpToAtkLevel : 0;
+            let initMapleLeafDefToHpLevel = applyMapleLeafToBase ? globalMapleLeafDefToHpLevel : 0;
+            let initMapleLeafHpToDefLevel = applyMapleLeafToBase ? globalMapleLeafHpToDefLevel : 0;
+
+            let initCad = initMapleLeafDefToAtkLevel * 4 / 100;
+            let initCah = initMapleLeafHpToAtkLevel * 2 / 1000;
+            let initCda = initMapleLeafAtkToDefLevel * 1 / 100;
+            let initCdh = initMapleLeafHpToDefLevel * 1 / 1000;
+            let initCha = initMapleLeafAtkToHpLevel * 20 / 100;
+            let initChd = initMapleLeafDefToHpLevel * 40 / 100;
+
+            let Cad = globalMapleLeafDefToAtkLevel * 4 / 100;
+            let Cah = globalMapleLeafHpToAtkLevel * 2 / 1000;
+            let Cda = globalMapleLeafAtkToDefLevel * 1 / 100;
+            let Cdh = globalMapleLeafHpToDefLevel * 1 / 1000;
+            let Cha = globalMapleLeafAtkToHpLevel * 20 / 100;
+            let Chd = globalMapleLeafDefToHpLevel * 40 / 100;
 
             // 역산: 순수 기본 능력치는 입력된 최종값을 마을 %로 나눈 값
             // 3x3 선형 방정식을 크라머 공식으로 역산하여 백금 단풍잎 보너스를 제외한 순수 값을 구함
-            let det = 1*(1*1 - Cdh*Chd) - Cad*(Cda*1 - Cdh*Cha) + Cah*(Cda*Chd - 1*Cha);
+            let det = 1*(1*1 - initCdh*initChd) - initCad*(initCda*1 - initCdh*initCha) + initCah*(initCda*initChd - 1*initCha);
             let pureA = 0, pureD = 0, pureH = 0;
 
             if (det !== 0) {
-                let detX = finalAttack*(1*1 - Cdh*Chd) - Cad*(finalDefense*1 - Cdh*finalHP) + Cah*(finalDefense*Chd - 1*finalHP);
-                let detY = 1*(finalDefense*1 - Cdh*finalHP) - finalAttack*(Cda*1 - Cdh*Cha) + Cah*(Cda*finalHP - finalDefense*Cha);
-                let detZ = 1*(1*finalHP - finalDefense*Chd) - Cad*(Cda*finalHP - finalDefense*Cha) + finalAttack*(Cda*Chd - 1*Cha);
+                let detX = finalAttack*(1*1 - initCdh*initChd) - initCad*(finalDefense*1 - initCdh*finalHP) + initCah*(finalDefense*initChd - 1*finalHP);
+                let detY = 1*(finalDefense*1 - initCdh*finalHP) - finalAttack*(initCda*1 - initCdh*initCha) + initCah*(initCda*finalHP - finalDefense*initCha);
+                let detZ = 1*(1*finalHP - finalDefense*initChd) - initCad*(initCda*finalHP - finalDefense*initCha) + finalAttack*(initCda*initChd - 1*initCha);
                 pureA = detX / det;
                 pureD = detY / det;
                 pureH = detZ / det;
