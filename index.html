@@ -1639,12 +1639,12 @@
             autoHpPct += eqStats.autoHpPct;
 
             // 1단계: 역산된 기본 스탯에 % 배율만 먼저 적용 (이 값들을 고정으로 사용해야 함)
-            const buffedA = originalAttack * (1 + (townAttackPct + attackPct + advAttackPct) / 100) * (1 + autoAttackPct / 100);
-            const buffedD = originalDefense * (1 + (townDefensePct + defensePct + advDefensePct) / 100) * (1 + autoDefensePct / 100);
-            const buffedH = originalHP * (1 + (townHpPct + hpPct + advHpPct) / 100) * (1 + autoHpPct / 100);
+            const buffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + advAttackPct / 100) * (1 + autoAttackPct / 100);
+            const buffedD = originalDefense * (1 + (townDefensePct + defensePct) / 100) * (1 + advDefensePct / 100) * (1 + autoDefensePct / 100);
+            const buffedH = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + advHpPct / 100) * (1 + autoHpPct / 100);
 
             const basicAdvAttackPct = advAttackPct - twilightAdvAttackPct;
-            const basicBuffedA = originalAttack * (1 + (townAttackPct + attackPct + basicAdvAttackPct) / 100) * (1 + autoAttackPct / 100);
+            const basicBuffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + basicAdvAttackPct / 100) * (1 + autoAttackPct / 100);
 
             // 2단계: 백금 단풍잎 보너스를 '동시에' 계산하여 최종 합산 (순차적 갱신 절대 금지)
             finalAttack = buffedA + (buffedD * Cad) + (buffedH * Cah);
@@ -1785,10 +1785,10 @@
                 let iAdvHpPct = advHpPct - eqStats.advHpPct + intervalEqStats.advHpPct;
 
                 // 1단계: 역산된 기본 스탯에 % 배율만 먼저 적용 (이 값들을 고정으로 사용해야 함)
-                const iBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct + iAdvAttackPct) / 100) * (1 + iAutoAttackPct / 100);
-                const iBuffedD = originalDefense * (1 + (townDefensePct + iDefensePct + iAdvDefensePct) / 100) * (1 + iAutoDefensePct / 100);
-                const iBuffedH = originalHP * (1 + (townHpPct + hpPct + iAdvHpPct) / 100) * (1 + iAutoHpPct / 100);
-                const iBasicBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct + iBasicAdvAttackPct) / 100) * (1 + iAutoAttackPct / 100);
+                const iBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + iAdvAttackPct / 100) * (1 + iAutoAttackPct / 100);
+                const iBuffedD = originalDefense * (1 + (townDefensePct + iDefensePct) / 100) * (1 + iAdvDefensePct / 100) * (1 + iAutoDefensePct / 100);
+                const iBuffedH = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + iAdvHpPct / 100) * (1 + iAutoHpPct / 100);
+                const iBasicBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + iBasicAdvAttackPct / 100) * (1 + iAutoAttackPct / 100);
 
                 // 2단계: 백금 단풍잎 보너스를 '동시에' 계산하여 최종 합산 (순차적 갱신 절대 금지)
                 let iFinalAttack = iBuffedA + (iBuffedD * Cad) + (iBuffedH * Cah);
