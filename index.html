@@ -238,6 +238,7 @@
                         <div class="text-right text-sm text-gray-700 mt-1">착용 공격력: <span id="cosPocketTotal" class="font-bold text-indigo-600">0</span></div>
                     </div>
                 </div>
+
                 <!-- 하단 접기 버튼 -->
                 <div class="md:col-span-12 mt-4 text-center border-t pb-2 pt-4">
                     <button onclick="toggleSection('equipSection', 'equipArrow', 'equipBtnGroup')" class="text-indigo-600 font-bold hover:text-indigo-800">▲ 접기</button>
@@ -574,6 +575,16 @@
                         </div>
                     </div>
                 </div>
+
+                    <!-- Custom Damage Line Column -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 col-span-1 md:col-span-3">
+                        <h2 class="text-xl font-bold mb-4 text-purple-600 border-b pb-2">추가 피해량 (곱연산)</h2>
+                        <div id="customDmgContainer" class="space-y-2">
+                            <!-- Dynamic rows will be added here -->
+                        </div>
+                        <button onclick="addCustomDmgRow()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-bold">+ 피해량 라인 추가</button>
+                    </div>
+
                 <!-- 하단 접기 버튼 -->
                 <div class="mt-4 text-center border-t pb-2 pt-4">
                     <button onclick="toggleSection('manualStatsSection', 'manualStatsArrow')" class="text-purple-600 font-bold hover:text-purple-800">▲ 접기</button>
@@ -888,6 +899,67 @@
             });
         }
 
+
+        let customDmgCount = 0;
+
+        function addCustomDmgRow(name = '', value = 0, sign = 1) {
+            customDmgCount++;
+            const id = customDmgCount;
+            const container = document.getElementById('customDmgContainer');
+
+            const row = document.createElement('div');
+            row.className = 'flex items-center space-x-2 custom-dmg-row';
+            row.id = `customDmgRow_${id}`;
+
+            const defaultName = name || `피해량${id}`;
+
+            row.innerHTML = `
+                <input type="text" id="customDmgName_${id}" class="calc-input border p-1 rounded flex-1" value="${defaultName}" placeholder="항목 이름">
+                <select id="customDmgSign_${id}" class="calc-input border p-1 rounded">
+                    <option value="1" ${sign == 1 ? 'selected' : ''}>+</option>
+                    <option value="-1" ${sign == -1 ? 'selected' : ''}>-</option>
+                </select>
+                <input type="number" id="customDmgVal_${id}" class="calc-input border p-1 rounded w-24" value="${value}" step="0.1" >
+                <span class="text-gray-600">%</span>
+                <button onclick="removeCustomDmgRow(${id})" class="text-red-500 hover:text-red-700 font-bold px-2">X</button>
+            `;
+
+            container.appendChild(row);
+
+            // Trigger recalculation if necessary or setup listeners
+            document.getElementById(`customDmgName_${id}`).addEventListener('input', calculate);
+            document.getElementById(`customDmgSign_${id}`).addEventListener('change', calculate);
+            document.getElementById(`customDmgVal_${id}`).addEventListener('input', calculate);
+        }
+
+        function removeCustomDmgRow(id) {
+            const row = document.getElementById(`customDmgRow_${id}`);
+            if (row) {
+                row.remove();
+                calculate();
+            }
+        }
+
+        function getCustomDmgMulti() {
+            let multi = 1;
+            const rows = document.querySelectorAll('.custom-dmg-row');
+            rows.forEach(row => {
+                const id = row.id.split('_')[1];
+                const sign = parseFloat(document.getElementById(`customDmgSign_${id}`).value);
+                const val = parseFloat(document.getElementById(`customDmgVal_${id}`).value) || 0;
+
+                if (val !== 0) {
+                    multi *= (1 + (sign * val) / 100);
+                }
+            });
+            return multi;
+        }
+
+        // Initialize with one default row
+        window.addEventListener('DOMContentLoaded', () => {
+            // We'll call this in init() or check if cookies loaded first
+        });
+
         function toggleSection(sectionId, arrowId, btnGroupId) {
             const section = document.getElementById(sectionId);
             const arrow = document.getElementById(arrowId);
@@ -1201,10 +1273,24 @@
         // Load saved values from cookies
         function loadSettings() {
             const savedData = getCookie('mapleCalcData');
+            if (!savedData || !savedData.includes('customDmgRowsData')) {
+                // If no saved data or missing customDmg, initialize default
+                addCustomDmgRow('피해량1', 0, 1);
+            }
             if (savedData) {
                 try {
                     const parsed = JSON.parse(savedData);
+
+                    if (parsed['customDmgRowsData'] && parsed['customDmgRowsData'].length > 0) {
+                        parsed['customDmgRowsData'].forEach(row => {
+                            addCustomDmgRow(row.name, row.val, row.sign);
+                        });
+                    } else {
+                        addCustomDmgRow('피해량1', 0, 1);
+                    }
+
                     inputs.forEach(input => {
+                        if (input.id && input.id.startsWith('customDmg')) return;
                         if (parsed[input.id] !== undefined) {
                             if (input.type === 'checkbox') {
                                 input.checked = parsed[input.id];
@@ -1268,12 +1354,27 @@
         function saveSettings() {
             const data = {};
             inputs.forEach(input => {
+                // Skip dynamically generated calc-inputs from saving in the default loop
+                if (input.id && input.id.startsWith('customDmg')) return;
+
                 if (input.type === 'checkbox') {
                     data[input.id] = input.checked;
                 } else {
                     data[input.id] = input.value;
                 }
             });
+
+            // Save custom damage rows
+            const customDmgRows = [];
+            document.querySelectorAll('.custom-dmg-row').forEach(row => {
+                const id = row.id.split('_')[1];
+                const name = document.getElementById('customDmgName_' + id).value;
+                const sign = document.getElementById('customDmgSign_' + id).value;
+                const val = document.getElementById('customDmgVal_' + id).value;
+                customDmgRows.push({ name, sign, val });
+            });
+            data['customDmgRowsData'] = customDmgRows;
+
             setCookie('mapleCalcData', JSON.stringify(data), 30); // Save for 30 days
         }
 
@@ -1416,13 +1517,13 @@
                 allDmg: 0,
                 normalMonsterDmg: 0,
                 bossMonsterDmg: 0,
-                aoeDmg: 0,
-                projectileDmg: 0,
+                aoeDmgMulti: 1,
+                projectileDmgMulti: 1,
                 allClassDmg: 0,
                 basicAttackDmg: 0,
                 skillDmg: 0,
-                basicAttackDamagePct: 0,
-                skillAttackDamagePct: 0,
+                basicAttackDamageMulti: 1,
+                skillAttackDamageMulti: 1,
                 dmgTakenInc: 0,
 
                 // Add missing stats here
@@ -1551,13 +1652,13 @@
                 else if (statName === '모든 데미지%') eqStats.allDmg += effectiveValue;
                 else if (statName === '일반 몬스터 데미지%') eqStats.normalMonsterDmg += effectiveValue;
                 else if (statName === '보스 몬스터 데미지%') eqStats.bossMonsterDmg += effectiveValue;
-                else if (statName === '범위 피해량%' || statName === '공격범위/피해량%') eqStats.aoeDmg += effectiveValue;
-                else if (statName === '발사체 피해량%') eqStats.projectileDmg += effectiveValue;
+                else if (statName === '범위 피해량%' || statName === '공격범위/피해량%') eqStats.aoeDmgMulti *= (1 + effectiveValue / 100);
+                else if (statName === '발사체 피해량%') eqStats.projectileDmgMulti *= (1 + effectiveValue / 100);
                 else if (statName === '전직업 데미지%') eqStats.allClassDmg += effectiveValue;
                 else if (statName === '기본공격 데미지%') eqStats.basicAttackDmg += effectiveValue;
                 else if (statName === '스킬 데미지%') eqStats.skillDmg += effectiveValue;
-                else if (statName === '기본공격 피해량%') eqStats.basicAttackDamagePct += effectiveValue;
-                else if (statName === '스킬 피해량%' || statName === '공격스킬 피해량%') eqStats.skillAttackDamagePct += effectiveValue;
+                else if (statName === '기본공격 피해량%') eqStats.basicAttackDamageMulti *= (1 + effectiveValue / 100);
+                else if (statName === '스킬 피해량%' || statName === '공격스킬 피해량%') eqStats.skillAttackDamageMulti *= (1 + effectiveValue / 100);
                 else if (statName === '적이 받는 피해량 증가%' || statName === '적이 받는 피해 증가%') eqStats.dmgTakenInc += effectiveValue;
                 // Newly added missing stats
                 else if (statName === '전사 데미지%') eqStats.warriorDmg += effectiveValue;
@@ -1639,12 +1740,12 @@
             autoHpPct += eqStats.autoHpPct;
 
             // 1단계: 역산된 기본 스탯에 % 배율만 먼저 적용 (이 값들을 고정으로 사용해야 함)
-            const buffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + advAttackPct / 100) * (1 + autoAttackPct / 100);
-            const buffedD = originalDefense * (1 + (townDefensePct + defensePct) / 100) * (1 + advDefensePct / 100) * (1 + autoDefensePct / 100);
-            const buffedH = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + advHpPct / 100) * (1 + autoHpPct / 100);
+            const buffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + (advAttackPct + autoAttackPct) / 100);
+            const buffedD = originalDefense * (1 + (townDefensePct + defensePct) / 100) * (1 + (advDefensePct + autoDefensePct) / 100);
+            const buffedH = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + (advHpPct + autoHpPct) / 100);
 
             const basicAdvAttackPct = advAttackPct - twilightAdvAttackPct;
-            const basicBuffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + basicAdvAttackPct / 100) * (1 + autoAttackPct / 100);
+            const basicBuffedA = originalAttack * (1 + (townAttackPct + attackPct) / 100) * (1 + (basicAdvAttackPct + autoAttackPct) / 100);
 
             // 2단계: 백금 단풍잎 보너스를 '동시에' 계산하여 최종 합산 (순차적 갱신 절대 금지)
             finalAttack = buffedA + (buffedD * Cad) + (buffedH * Cah);
@@ -1715,6 +1816,7 @@
             let weightedSumSkillCritDamage = 0;
 
             // Helper to compute damage for a given interval
+            const customDmgMulti = getCustomDmgMulti();
             const computeIntervalDamage = (dt, t_mid) => {
                 let intervalEqStats = JSON.parse(JSON.stringify(eqStats));
                 let iTwilightAdvAttackPct = twilightAdvAttackPct;
@@ -1744,13 +1846,13 @@
                         else if (statName === '모든 데미지%') intervalEqStats.allDmg += effectiveValue;
                         else if (statName === '일반 몬스터 데미지%') intervalEqStats.normalMonsterDmg += effectiveValue;
                         else if (statName === '보스 몬스터 데미지%') intervalEqStats.bossMonsterDmg += effectiveValue;
-                        else if (statName === '범위 피해량%' || statName === '공격범위/피해량%') intervalEqStats.aoeDmg += effectiveValue;
-                        else if (statName === '발사체 피해량%') intervalEqStats.projectileDmg += effectiveValue;
+                        else if (statName === '범위 피해량%' || statName === '공격범위/피해량%') intervalEqStats.aoeDmgMulti *= (1 + effectiveValue / 100);
+                        else if (statName === '발사체 피해량%') intervalEqStats.projectileDmgMulti *= (1 + effectiveValue / 100);
                         else if (statName === '전직업 데미지%') intervalEqStats.allClassDmg += effectiveValue;
                         else if (statName === '기본공격 데미지%') intervalEqStats.basicAttackDmg += effectiveValue;
                         else if (statName === '스킬 데미지%') intervalEqStats.skillDmg += effectiveValue;
-                        else if (statName === '기본공격 피해량%') intervalEqStats.basicAttackDamagePct += effectiveValue;
-                        else if (statName === '스킬 피해량%' || statName === '공격스킬 피해량%') intervalEqStats.skillAttackDamagePct += effectiveValue;
+                        else if (statName === '기본공격 피해량%') intervalEqStats.basicAttackDamageMulti *= (1 + effectiveValue / 100);
+                        else if (statName === '스킬 피해량%' || statName === '공격스킬 피해량%') intervalEqStats.skillAttackDamageMulti *= (1 + effectiveValue / 100);
                         else if (statName === '적이 받는 피해량 증가%' || statName === '적이 받는 피해 증가%') intervalEqStats.dmgTakenInc += effectiveValue;
                         else if (statName === '전사 데미지%') intervalEqStats.warriorDmg += effectiveValue;
                         else if (statName === '마법사 데미지%') intervalEqStats.mageDmg += effectiveValue;
@@ -1785,10 +1887,10 @@
                 let iAdvHpPct = advHpPct - eqStats.advHpPct + intervalEqStats.advHpPct;
 
                 // 1단계: 역산된 기본 스탯에 % 배율만 먼저 적용 (이 값들을 고정으로 사용해야 함)
-                const iBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + iAdvAttackPct / 100) * (1 + iAutoAttackPct / 100);
-                const iBuffedD = originalDefense * (1 + (townDefensePct + iDefensePct) / 100) * (1 + iAdvDefensePct / 100) * (1 + iAutoDefensePct / 100);
-                const iBuffedH = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + iAdvHpPct / 100) * (1 + iAutoHpPct / 100);
-                const iBasicBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + iBasicAdvAttackPct / 100) * (1 + iAutoAttackPct / 100);
+                const iBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + (iAdvAttackPct + iAutoAttackPct) / 100);
+                const iBuffedD = originalDefense * (1 + (townDefensePct + iDefensePct) / 100) * (1 + (iAdvDefensePct + iAutoDefensePct) / 100);
+                const iBuffedH = originalHP * (1 + (townHpPct + hpPct) / 100) * (1 + (iAdvHpPct + iAutoHpPct) / 100);
+                const iBasicBuffedA = originalAttack * (1 + (townAttackPct + iAttackPct) / 100) * (1 + (iBasicAdvAttackPct + iAutoAttackPct) / 100);
 
                 // 2단계: 백금 단풍잎 보너스를 '동시에' 계산하여 최종 합산 (순차적 갱신 절대 금지)
                 let iFinalAttack = iBuffedA + (iBuffedD * Cad) + (iBuffedH * Cah);
@@ -1815,16 +1917,16 @@
                 const iMonsterDmgBase = monsterType === '일반' ? val('normalMonsterDmg') + intervalEqStats.normalMonsterDmg : val('bossMonsterDmg') + intervalEqStats.bossMonsterDmg;
                 const iAllDmg = val('allDmg') + intervalEqStats.allDmg;
                 const iSkillMultiplier = val('skillMultiplier');
-                const iBasicAttackDamagePct = val('basicAttackDamagePct') + intervalEqStats.basicAttackDamagePct;
-                const iSkillAttackDamagePct = val('skillAttackDamagePct') + intervalEqStats.skillAttackDamagePct + val('artifact_10');
+                const iBasicAttackDamageMulti = (1 + val('basicAttackDamagePct') / 100) * intervalEqStats.basicAttackDamageMulti;
+                const iSkillAttackDamageMulti = (1 + val('skillAttackDamagePct') / 100) * (1 + val('artifact_10') / 100) * intervalEqStats.skillAttackDamageMulti;
                 const iDmgTakenInc = val('dmgTakenInc') + intervalEqStats.dmgTakenInc;
 
                 let iHitTypeDmgMultiplier = 1;
-                if(hitType === '범위') iHitTypeDmgMultiplier = 1 + (val('aoeDmg') + intervalEqStats.aoeDmg) / 100;
-                if(hitType === '발사체') iHitTypeDmgMultiplier = 1 + (val('projectileDmg') + intervalEqStats.projectileDmg) / 100;
+                if(hitType === '범위') iHitTypeDmgMultiplier = (1 + val('aoeDmg') / 100) * intervalEqStats.aoeDmgMulti;
+                if(hitType === '발사체') iHitTypeDmgMultiplier = (1 + val('projectileDmg') / 100) * intervalEqStats.projectileDmgMulti;
 
-                const iBasicExtraAttackDamageMultiplier = 1 + iBasicAttackDamagePct / 100;
-                const iSkillExtraAttackDamageMultiplier = 1 + iSkillAttackDamagePct / 100;
+                const iBasicExtraAttackDamageMultiplier = iBasicAttackDamageMulti;
+                const iSkillExtraAttackDamageMultiplier = iSkillAttackDamageMulti;
                 const iDmgTakenMultiplier = 1 + iDmgTakenInc / 100;
 
                 const iBasicTypeDmg = val('basicAttackDmg') + intervalEqStats.basicAttackDmg;
@@ -1835,14 +1937,14 @@
                                    * (1 + (iMyClassDmg + iAllClassDmg) / 100)
                                    * (1 + iMonsterDmgBase / 100)
                                    * (1 + (iAllDmg + iSkillTypeDmg) / 100)
-                                   * iDmgTakenMultiplier;
+                                   * iDmgTakenMultiplier * customDmgMulti;
 
                 const iBasicBaseDamageMultiplier = iBasicFinalAttack
                                    * (iSkillMultiplier / 100)
                                    * (1 + (iMyClassDmg + iAllClassDmg) / 100)
                                    * (1 + iMonsterDmgBase / 100)
                                    * (1 + (iAllDmg + iBasicTypeDmg) / 100)
-                                   * iDmgTakenMultiplier;
+                                   * iDmgTakenMultiplier * customDmgMulti;
 
                 let iHitMulti = intervalEqStats.baseHitMulti > 0 ? intervalEqStats.baseHitMulti : 1;
                 let iHitDmgMulti = intervalEqStats.hitDmgMulti;
@@ -1926,8 +2028,8 @@
 
             // Base UI stats
             const allDmg = val('allDmg') + eqStats.allDmg;
-            const basicAttackDamagePct = val('basicAttackDamagePct') + eqStats.basicAttackDamagePct;
-            const skillAttackDamagePct = val('skillAttackDamagePct') + eqStats.skillAttackDamagePct + val('artifact_10');
+            const basicAttackDamagePct = ((1 + val('basicAttackDamagePct') / 100) * eqStats.basicAttackDamageMulti - 1) * 100;
+            const skillAttackDamagePct = ((1 + val('skillAttackDamagePct') / 100) * (1 + val('artifact_10') / 100) * eqStats.skillAttackDamageMulti - 1) * 100;
             const dmgTakenInc = val('dmgTakenInc') + eqStats.dmgTakenInc;
 
             let atkSpeedInput = document.getElementById('atkSpeed');
@@ -2050,8 +2152,8 @@
             document.getElementById('realAllDmg').innerText = allDmg.toFixed(1) + '%';
             document.getElementById('realNormalMonsterDmg').innerText = (val('normalMonsterDmg') + eqStats.normalMonsterDmg).toFixed(1) + '%';
             document.getElementById('realBossMonsterDmg').innerText = (val('bossMonsterDmg') + eqStats.bossMonsterDmg).toFixed(1) + '%';
-            document.getElementById('realAoeDmg').innerText = (val('aoeDmg') + eqStats.aoeDmg).toFixed(1) + '%';
-            document.getElementById('realProjectileDmg').innerText = (val('projectileDmg') + eqStats.projectileDmg).toFixed(1) + '%';
+            document.getElementById('realAoeDmg').innerText = (((1 + val('aoeDmg') / 100) * eqStats.aoeDmgMulti - 1) * 100).toFixed(1) + '%';
+            document.getElementById('realProjectileDmg').innerText = (((1 + val('projectileDmg') / 100) * eqStats.projectileDmgMulti - 1) * 100).toFixed(1) + '%';
             document.getElementById('realBasicAttackDamagePct').innerText = basicAttackDamagePct.toFixed(1) + '%';
             document.getElementById('realSkillAttackDamagePct').innerText = skillAttackDamagePct.toFixed(1) + '%';
             document.getElementById('realDmgTakenInc').innerText = dmgTakenInc.toFixed(1) + '%';
